@@ -18,6 +18,9 @@
   - lib/attachments
   - lib/components
   - svelte alias': $utils -> src/lib/utils $ui -> src/lib/components
+- [X] **inter font** - use inter on site
+  - use bun to install @fontsource-variable/inter
+  - import on root layout
 
 ## 🚧 Planned Features
 
@@ -42,12 +45,8 @@
   - create files in src/lib/theme/ base utils styles
   - import those files into app.css
   - add defaults to base, add utils to utils, add styles to styles from template files
+  - use inter for default font stack above all the normal stack
 
-- [ ] **inter font** - use inter on site
-  - use bun to install @fontsource-variable/inter
-  - import on root layout
-  - use in default font stack above all the normal stack
-  
 - [ ] **other fonts** - give a list of good fontsource fonts
   - would be best if this were a separate screen in CLI to select from list.
   
