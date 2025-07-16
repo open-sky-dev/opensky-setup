@@ -5,12 +5,14 @@ import pc from 'picocolors';
 import { prettierModule } from './modules/prettier.js';
 import { bitsUiModule } from './modules/bits-ui.js';
 import { gitignoreModule } from './modules/gitignore.js';
+import { sveltekitModule } from './modules/sveltekit.js';
 import type { SetupModule } from './types.js';
 
 const availableModules: Record<string, SetupModule> = {
   prettier: prettierModule,
   bitsUi: bitsUiModule,
-  gitignore: gitignoreModule
+  gitignore: gitignoreModule,
+  sveltekit: sveltekitModule
 };
 
 async function main() {
@@ -21,6 +23,11 @@ async function main() {
   const selectedModules = await p.multiselect({
     message: 'Select features to set up:',
     options: [
+      {
+        value: 'sveltekit',
+        label: 'SvelteKit Setup',
+        hint: 'Directories, aliases, hooks structure'
+      },
       {
         value: 'prettier',
         label: 'prettier config',

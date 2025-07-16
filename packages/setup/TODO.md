@@ -12,10 +12,10 @@
 ### Current Modules
 - [x] **Prettier Configuration** - Sets `semi: false` in `.prettierrc`
 - [x] **bits-ui Installation** - Installs bits-ui component library
+- [X] gitignore rules
 
 ## 🚧 Planned Features
 
-- [ ] gitignore rules
 
 - [ ] sveltekit project setup
   - src/hooks folder with hooks.ts, hooks.server.ts, and hooks.client.ts
