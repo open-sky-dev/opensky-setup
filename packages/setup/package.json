@@ -23,7 +23,8 @@
     "fs-extra": "^11.0.0",
     "edit-json-file": "^1.8.0",
     "execa": "^8.0.1",
-    "picocolors": "^1.0.0"
+    "picocolors": "^1.0.0",
+    "ts-morph": "^21.0.1"
   },
   "license": "MIT"
 }
