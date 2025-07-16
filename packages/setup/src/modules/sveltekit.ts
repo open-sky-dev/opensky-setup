@@ -16,6 +16,7 @@ export const sveltekitModule: SetupModule = {
         'src/hooks',
         'src/lib/attachments',
         'src/lib/components',
+        'src/lib/ui',
         'src/lib/utils'
       ];
       
@@ -30,7 +31,7 @@ export const sveltekitModule: SetupModule = {
       // Update svelte.config.js with aliases and hooks configuration
       await updateSvelteConfig(
         {
-          '$ui': 'src/lib/components',
+          '$ui': 'src/lib/ui',
           '$utils': 'src/lib/utils'
         },
         {
