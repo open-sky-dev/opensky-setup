@@ -2,26 +2,12 @@
 
 ## 🚧 Planned Features
 
-- [ ] setup resend emails and react email
-  - lib/server/email
+- [ ] email example emails
 
-- [ ] drizzle setup
-  - lib/server/db/schema for schema files (drizzle)
-  - setup dev/prod setup for sqlite and for postgres
-
-- [ ] **Turso (LibSQL)**
-  - setup a local dev db
-  - add reset script to /db
-  - setup directories for db (migrations out dir, seed script dir)
 - [ ] **Neon (PostgreSQL)** 
   - not sure what kind of setup it required
 - [ ] **upstash redis**: not sure what this would look like
 - [ ] **upstash queue**: not sure what this would look like
-
-- [ ] **seo/meta** install sveltekit-meta package and setup basic/example usage
-- [ ] **env files** setup for .env, .env.dev, .env.prod, .env.example
-  - maybe look into having a tool that 
-- [ ] **Common Utility Functions** - Frequently used helpers
 
 ### blocked, come back to these later
 - [ ] **@opensky/auth** - my own auth package
@@ -58,12 +44,16 @@
 
 ## ✅ Completed Features
 
-- [x] **CLI Framework** - Interactive prompts with clack
-- [x] **Modular Architecture** - Easy to add/remove features
-- [x] **JSON Editing** - Precise modifications using edit-json-file
-- [x] **Dependency Management** - Automatic package installation via bun
-- [x] **Build System** - TypeScript compilation and linking
-
+- [X] **env files** setup for .env, .env.dev, .env.prod, .env.example
+- maybe look into having a tool that 
+- [X] utils
+- [X] error.html template
+- [X] setup resend emails and react email
+- lib/server/email
+- [X] drizzle setup
+- lib/server/db/schema for schema files (drizzle)
+- setup dev/prod setup for sqlite and for postgres
+- [X] **seo/meta** install sveltekit-meta package and setup basic/example usage
 - [x] **Prettier Configuration** - Sets `semi: false` in `.prettierrc`
 - [x] **bits-ui Installation** - Installs bits-ui component library
 - [X] gitignore rules
@@ -83,6 +73,12 @@
 - import those files into app.css
 - add defaults to base, add utils to utils, add styles to styles from template files
 - use inter for default font stack above all the normal stack
+
+- [x] **CLI Framework** - Interactive prompts with clack
+- [x] **Modular Architecture** - Easy to add/remove features
+- [x] **JSON Editing** - Precise modifications using edit-json-file
+- [x] **Dependency Management** - Automatic package installation via bun
+- [x] **Build System** - TypeScript compilation and linking
 
 ---
 

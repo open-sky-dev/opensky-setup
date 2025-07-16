@@ -15,7 +15,8 @@ export interface SvelteConfigHooks {
 
 export async function updateSvelteConfig(
   aliases?: SvelteConfigAlias,
-  hooks?: SvelteConfigHooks
+  hooks?: SvelteConfigHooks,
+  errorTemplate?: string
 ): Promise<void> {
   const configPath = 'svelte.config.js';
   
@@ -70,6 +71,21 @@ export async function updateSvelteConfig(
         });
         hasChanges = true;
       }
+    }
+  }
+  
+  // Update error template
+  if (errorTemplate) {
+    const filesProperty = getOrCreateProperty(kitObject, 'files');
+    const filesObject = filesProperty.getInitializer() as ObjectLiteralExpression;
+    
+    const existingErrorTemplate = filesObject.getProperty('errorTemplate');
+    if (!existingErrorTemplate) {
+      filesObject.addPropertyAssignment({
+        name: 'errorTemplate',
+        initializer: `'${errorTemplate}'`
+      });
+      hasChanges = true;
     }
   }
   

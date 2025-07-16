@@ -7,6 +7,11 @@ import { bitsUiModule } from './modules/bits-ui.js';
 import { gitignoreModule } from './modules/gitignore.js';
 import { sveltekitModule } from './modules/sveltekit.js';
 import { tailwindModule } from './modules/tailwind.js';
+import { drizzleModule } from './modules/drizzle.js';
+import { metaModule } from './modules/meta.js';
+import { resendModule } from './modules/resend.js';
+import { utilsModule } from './modules/utils.js';
+import { envModule } from './modules/env.js';
 import { runPrettierFormat } from './utils/prettier.js';
 import { installInterFont, installFont, getFontOptions } from './utils/fonts.js';
 import type { SetupModule } from './types.js';
@@ -16,7 +21,12 @@ const availableModules: Record<string, SetupModule> = {
   bitsUi: bitsUiModule,
   gitignore: gitignoreModule,
   sveltekit: sveltekitModule,
-  tailwind: tailwindModule
+  tailwind: tailwindModule,
+  drizzle: drizzleModule,
+  meta: metaModule,
+  resend: resendModule,
+  utils: utilsModule,
+  env: envModule
 };
 
 async function main() {
@@ -54,6 +64,31 @@ async function main() {
         value: 'tailwind',
         label: 'tailwind theme structure',
         hint: 'Move app.css to theme directory with organized imports'
+      },
+      {
+        value: 'drizzle',
+        label: 'drizzle database setup',
+        hint: 'Organize schema, add seeds, configure for SQLite or Neon'
+      },
+      {
+        value: 'meta',
+        label: 'meta/SEO setup',
+        hint: 'Install sveltekit-meta and create load functions'
+      },
+      {
+        value: 'resend',
+        label: 'resend email service',
+        hint: 'Install resend, react-email and create email utilities'
+      },
+      {
+        value: 'utils',
+        label: 'utility functions',
+        hint: 'Install clsx, tailwind-merge and copy utility functions'
+      },
+      {
+        value: 'env',
+        label: 'environment variables',
+        hint: 'Add PUBLIC_* variables to all .env files'
       },
     ],
     required: false

@@ -1,0 +1,158 @@
+import { promises as fs } from 'fs';
+import { pathExists, ensureDir } from 'fs-extra';
+import path from 'path';
+import { log } from '../utils/logger.js';
+import { copyTemplateFile } from '../utils/templates.js';
+import { editJson } from '../utils/json.js';
+import { updateEnvFile, createEnvFile, getDevEnvVariables, getProdEnvVariables } from '../utils/env.js';
+import type { SetupModule } from '../types.js';
+
+async function detectDrizzleType(): Promise<'drizzle' | 'neon' | null> {
+  // Check package.json for dependencies
+  if (await pathExists('package.json')) {
+    const packageJson = JSON.parse(await fs.readFile('package.json', 'utf-8'));
+    const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+    
+    // Check for Neon dependencies
+    if (deps['@neondatabase/serverless'] || deps['drizzle-orm/neon-http']) {
+      return 'neon';
+    }
+    
+    // Check for SQLite dependencies
+    if (deps['better-sqlite3'] || deps['drizzle-orm/better-sqlite3']) {
+      return 'drizzle';
+    }
+    
+    // Check for general drizzle-orm (default to drizzle/sqlite)
+    if (deps['drizzle-orm']) {
+      return 'drizzle';
+    }
+  }
+  
+  // Check existing drizzle.config.ts
+  if (await pathExists('drizzle.config.ts')) {
+    const configContent = await fs.readFile('drizzle.config.ts', 'utf-8');
+    if (configContent.includes('postgresql') || configContent.includes('neon')) {
+      return 'neon';
+    }
+    if (configContent.includes('sqlite')) {
+      return 'drizzle';
+    }
+  }
+  
+  return null;
+}
+
+async function setupSchemaDirectory(): Promise<void> {
+  const schemaDir = 'src/lib/server/db/schema';
+  const oldSchemaPath = 'src/lib/server/db/schema.ts';
+  const newSchemaPath = path.join(schemaDir, 'index.ts');
+  
+  // Create schema directory
+  await ensureDir(schemaDir);
+  log.detail('Created schema directory');
+  
+  // Move existing schema.ts to schema/index.ts
+  if (await pathExists(oldSchemaPath)) {
+    if (!(await pathExists(newSchemaPath))) {
+      await fs.rename(oldSchemaPath, newSchemaPath);
+      log.detail('Moved schema.ts to schema/index.ts');
+    } else {
+      log.detail('Schema index.ts already exists');
+    }
+  } else {
+    // Create empty schema index if it doesn't exist
+    if (!(await pathExists(newSchemaPath))) {
+      await fs.writeFile(newSchemaPath, '// Database schema definitions\nexport {};\n');
+      log.detail('Created empty schema/index.ts');
+    }
+  }
+}
+
+async function setupSeedsDirectory(): Promise<void> {
+  const seedsDir = 'db/seeds';
+  const seedsIndexPath = path.join(seedsDir, 'index.ts');
+  
+  await ensureDir(seedsDir);
+  
+  await copyTemplateFile('db/seeds/index.ts', seedsIndexPath, true);
+  log.detail('Created seeds/index.ts in root db/ directory');
+}
+
+async function setupDatabaseFiles(dbType: 'drizzle' | 'neon'): Promise<void> {
+  const dbDir = 'src/lib/server/db';
+  
+  // Copy database index.ts (force overwrite)
+  await copyTemplateFile(`db/${dbType}/index.ts`, path.join(dbDir, 'index.ts'), true);
+  log.detail(`Updated database connection for ${dbType}`);
+  
+  // Copy drizzle.config.ts (force overwrite)
+  await copyTemplateFile(`db/${dbType}/drizzle.config.ts`, 'drizzle.config.ts', true);
+  log.detail(`Updated drizzle.config.ts for ${dbType}`);
+  
+  // Copy reset.ts to root db/ directory (only for drizzle)
+  if (dbType === 'drizzle') {
+    await copyTemplateFile('db/drizzle/reset.ts', 'db/reset.ts', true);
+    log.detail('Added database reset utility to root db/ directory');
+  }
+}
+
+async function updatePackageJsonScripts(): Promise<void> {
+  await editJson('package.json', {
+    'scripts.db:gen': 'drizzle-kit generate',
+    'scripts.db:reset': 'bun run db/reset.ts'
+  });
+  
+  log.detail('Added database scripts to package.json');
+}
+
+async function setupEnvironmentFiles(dbType: 'drizzle' | 'neon'): Promise<void> {
+  // Update .env file with development variables (remove old DB vars and add new ones)
+  const devVariables = getDevEnvVariables(dbType);
+  await updateEnvFile('.env', devVariables, ['DATABASE*', 'DB*']);
+  log.detail('Updated .env file with development database variables');
+  
+  // Create .env.example with development variables
+  await createEnvFile('.env.example', devVariables);
+  
+  // Create .env.prod with production variables
+  const prodVariables = getProdEnvVariables(dbType);
+  await createEnvFile('.env.prod', prodVariables);
+}
+
+export const drizzleModule: SetupModule = {
+  async install() {
+    log.moduleTitle('Setting up Drizzle database structure');
+    
+    // Detect the database type
+    const dbType = await detectDrizzleType();
+    
+    if (!dbType) {
+      log.error('Could not detect Drizzle database type. Make sure drizzle-orm is installed.');
+      return;
+    }
+    
+    log.detail(`Detected database type: ${dbType}`);
+    
+    // Create base database directories
+    await ensureDir('src/lib/server/db');
+    await ensureDir('db');
+    
+    // Setup schema directory
+    await setupSchemaDirectory();
+    
+    // Setup seeds directory
+    await setupSeedsDirectory();
+    
+    // Setup database files based on detected type
+    await setupDatabaseFiles(dbType);
+    
+    // Update package.json scripts
+    await updatePackageJsonScripts();
+    
+    // Setup environment files
+    await setupEnvironmentFiles(dbType);
+    
+    log.success('Drizzle database structure configured');
+  }
+};
