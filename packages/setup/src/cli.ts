@@ -48,7 +48,8 @@ async function main() {
         label: '.gitignore rules',
         hint: 'Add .env, .nova/, .vscode/ rules'
       },
-    ]
+    ],
+    required: false
   });
 
   if (p.isCancel(modules)) {
@@ -56,30 +57,27 @@ async function main() {
     process.exit(0);
   }
 
-  if (modules.length === 0) {
-    p.outro('No features selected. Goodbye!');
-    process.exit(0);
-  }
-
   const selectedModules = modules;
 
   // Install selected modules
-  const spinner = p.spinner();
-  spinner.start('Setting up selected features...');
+  if (selectedModules.length > 0) {
+    const spinner = p.spinner();
+    spinner.start('Setting up selected features...');
 
-  try {
-    for (const moduleKey of selectedModules) {
-      const module = availableModules[moduleKey];
-      if (module) {
-        await module.install();
+    try {
+      for (const moduleKey of selectedModules) {
+        const module = availableModules[moduleKey];
+        if (module) {
+          await module.install();
+        }
       }
+      
+      spinner.stop('All features set up successfully!');
+    } catch (error) {
+      spinner.stop('Setup failed');
+      p.outro(pc.red(`Error: ${error}`));
+      process.exit(1);
     }
-    
-    spinner.stop('All features set up successfully!');
-  } catch (error) {
-    spinner.stop('Setup failed');
-    p.outro(pc.red(`Error: ${error}`));
-    process.exit(1);
   }
 
   // Font selection step
@@ -93,7 +91,8 @@ async function main() {
         hint: 'Variable font with automatic layout integration'
       },
       ...fontOptions
-    ]
+    ],
+    required: false
   });
 
   if (p.isCancel(fonts)) {
@@ -123,10 +122,13 @@ async function main() {
     }
   }
 
-  // Run prettier to clean up formatting
-  await runPrettierFormat();
-  
-  p.outro(pc.green('Setup complete! 🎉'));
+  // Run prettier to clean up formatting if anything was installed
+  if (selectedModules.length > 0 || fonts.length > 0) {
+    await runPrettierFormat();
+    p.outro(pc.green('Setup complete! 🎉'));
+  } else {
+    p.outro('No features or fonts selected. Goodbye!');
+  }
 }
 
 main().catch(console.error);
