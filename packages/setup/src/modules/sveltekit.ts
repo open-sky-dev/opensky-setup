@@ -16,11 +16,10 @@ export const sveltekitModule: SetupModule = {
         'src/hooks',
         'src/lib/attachments',
         'src/lib/components',
-        'src/lib/ui',
         'src/lib/utils'
       ];
       
-      const createdDirs = await createDirectories(requiredDirs);
+      const createdDirs = await createDirectories(requiredDirs, ['hooks']);
       
       // Move existing hook files to src/hooks/
       const movedFiles = await moveHookFiles();
@@ -31,7 +30,7 @@ export const sveltekitModule: SetupModule = {
       // Update svelte.config.js with aliases and hooks configuration
       await updateSvelteConfig(
         {
-          '$ui': 'src/lib/ui',
+          '$ui': 'src/lib/components',
           '$utils': 'src/lib/utils'
         },
         {

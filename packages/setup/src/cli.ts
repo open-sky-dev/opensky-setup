@@ -25,7 +25,7 @@ async function main() {
     options: [
       {
         value: 'sveltekit',
-        label: 'SvelteKit Setup',
+        label: 'sveltekit setup',
         hint: 'Directories, aliases, hooks structure'
       },
       {
