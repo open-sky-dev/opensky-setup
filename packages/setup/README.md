@@ -1,76 +1,60 @@
 # @opensky/setup
 
-A post-scaffold configuration tool for SvelteKit projects. Run this after `bunx sv create` to automatically set up your project with common configurations and dependencies.
-
-## Installation
-
-```bash
-npm install -g @opensky/setup
-# or
-bun add -g @opensky/setup
-# or
-bunx @opensky/setup
-```
+Post-scaffold configuration tool for SvelteKit projects. Automates common setup tasks after running `bunx sv create`.
 
 ## Usage
 
-After creating a new SvelteKit project:
-
 ```bash
-bunx sv create my-project
-cd my-project
+# After running sv create to start a project
 bunx @opensky/setup
 ```
 
-This will launch an interactive CLI that lets you select which features to set up:
+Interactive CLI lets you select which features to configure:
 
-- **Prettier**: Configure Prettier with custom settings (semi: false)
-- **bits-ui**: Install the bits-ui component library
-
-## Development
-
-```bash
-# Install dependencies
-bun install
-
-# Run locally
-bun run dev
-
-# Test the CLI
-node src/cli.ts
-```
+- **SvelteKit** - Project structure, hooks, error page
+- **Prettier** - Code formatting configuration  
+- **Bits UI** - Component library installation
+- **Gitignore** - Essential ignore rules
+- **Tailwind** - Theme structure and CSS organization
+- **Drizzle** - Database setup with schema organization
+- **Meta** - SEO setup with sveltekit-meta
+- **Resend** - Email service with React Email
+- **Utils** - Utility functions (clsx, tailwind-merge)
+- **Environment** - PUBLIC_* variables setup
 
 ## Features
 
-### Current Modules
+- **Non-destructive** - Preserves existing files and configurations
+- **Template-based** - Uses actual files instead of code generation
+- **Modular** - Select only the features you need
+- **TypeScript-first** - All generated code is TypeScript
+- **Production-ready** - Follows SvelteKit best practices
 
-- **Prettier Module**: Updates `.prettierrc` with `semi: false`
-- **bits-ui Module**: Installs `bits-ui` as a dependency
+## What it does
 
-### Adding New Modules
+- Creates project directories and moves files to proper locations
+- Installs required dependencies automatically
+- Configures svelte.config.js with aliases and settings
+- Sets up environment files with proper variables
+- Copies utility functions and templates
+- Runs Prettier formatting when complete
 
-Create a new module in `src/modules/` that implements the `SetupModule` interface:
+## Requirements
 
-```typescript
-export const myModule: SetupModule = {
-  name: 'my-feature',
-  description: 'Description of what this does',
-  dependencies: ['some-package'],      // optional
-  devDependencies: ['dev-package'],    // optional
-  
-  async install() {
-    // Implementation here
-  }
-};
+- SvelteKit project (created with `bunx sv create`)
+- Bun or npm/yarn/pnpm
+- Git repository (recommended)
+
+## Examples
+
+```bash
+# Select all features
+bunx @opensky/setup
+# Press 'a' to select all
+
+# Select specific features
+bunx @opensky/setup
+# Use arrow keys and space to select
 ```
 
-Then add it to the available modules in `src/cli.ts`.
-
-## Architecture
-
-- **Modular Design**: Each feature is a separate module
-- **JSON Editing**: Uses `edit-json-file` for precise modifications
-- **Interactive CLI**: Built with `@clack/prompts`
-- **Dependency Management**: Automatically installs packages via bun
-
-This project was created using Bun. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+The tool preserves existing configurations and only adds what's missing, making it safe to run multiple times.
