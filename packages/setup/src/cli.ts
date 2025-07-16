@@ -6,6 +6,7 @@ import { prettierModule } from './modules/prettier.js';
 import { bitsUiModule } from './modules/bits-ui.js';
 import { gitignoreModule } from './modules/gitignore.js';
 import { sveltekitModule } from './modules/sveltekit.js';
+import { tailwindModule } from './modules/tailwind.js';
 import { runPrettierFormat } from './utils/prettier.js';
 import { installInterFont, installFont, getFontOptions } from './utils/fonts.js';
 import type { SetupModule } from './types.js';
@@ -14,7 +15,8 @@ const availableModules: Record<string, SetupModule> = {
   prettier: prettierModule,
   bitsUi: bitsUiModule,
   gitignore: gitignoreModule,
-  sveltekit: sveltekitModule
+  sveltekit: sveltekitModule,
+  tailwind: tailwindModule
 };
 
 async function main() {
@@ -47,6 +49,11 @@ async function main() {
         value: 'gitignore',
         label: '.gitignore rules',
         hint: 'Add .env, .nova/, .vscode/ rules'
+      },
+      {
+        value: 'tailwind',
+        label: 'tailwind theme structure',
+        hint: 'Move app.css to theme directory with organized imports'
       },
     ],
     required: false

@@ -1,0 +1,18 @@
+@theme inline {
+	--font-sans:
+		'Inter Variable', 'Inter V', 'Inter Var', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+		'Noto Color Emoji';
+	--font-mono:
+		'--default-mono-font-family', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas',
+		'"Liberation Mono"', '"Courier New"', 'monospace';
+
+	--tracking-tight-sm: -0.011em;
+	--tracking-tight-md: -0.013em;
+	--tracking-tight-lg: -0.015em;
+	
+	--shadow-inner-xs: inset 0 0 0 1px hsl(0, 0%, 88%);
+	--shadow-card:
+	rgba(0, 0, 0, 0.07) 0px 0.602187px 0.602187px -1.166667px,
+	rgba(0, 0, 0, 0.063) 0px 2.288533px 2.288533px -2.333333px,
+	rgba(0, 0, 0, 0.03) 0px 10px 10px -3.5px;
+}

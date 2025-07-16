@@ -2,37 +2,12 @@
 
 ## 🚧 Planned Features
 
-- [ ] CLI organization improvements
-  - split the modules up into sections: fonts, database, other
-  - so we currently have a first step to select 'all' or 'select' but i think the first step should change to a selector to choose if you want to add fonts and database sections. if you don't select these, their groups wont run at all. if you do select them, then they should be steps in the CLI.
-  - so you first are asked if you want fonts and database and you continue.
-  - then after those two, we show the main/other modules that you can select which you want and run.
-  - if you had selected fonts, we do that now and so we show the selections of modules that you can run under the fonts section.
-  - if you had selected database, then now we show you the selection for modules under the database section (currently i dont have any added)
-
-- [ ] **Tailwind CSS** - configure how i like tailwind to work
-  - create src/lib/theme directory to hold all our tailwind stuff
-  - add $tailwind alias to svelte config alias': $tailwind: 'src/lib/theme/app.css'
-  - move app.css to src/lib/theme/
-  - create files in src/lib/theme/ base utils styles
-  - import those files into app.css
-  - add defaults to base, add utils to utils, add styles to styles from template files
-  - use inter for default font stack above all the normal stack
-
 - [ ] setup resend emails and react email
   - lib/server/email
 
 - [ ] drizzle setup
   - lib/server/db/schema for schema files (drizzle)
   - setup dev/prod setup for sqlite and for postgres
-
-  
-### Auth
-
-### UI
-
-- [ ] **other fonts** - give a list of good fontsource fonts
-  - would be best if this were a separate screen in CLI to select from list.
 
 - [ ] **Turso (LibSQL)**
   - setup a local dev db
@@ -100,6 +75,14 @@
 - [X] **inter font** - use inter on site
   - use bun to install @fontsource-variable/inter
   - import on root layout
+- [X] **Tailwind CSS** - configure how i like tailwind to work
+- create src/lib/theme directory to hold all our tailwind stuff
+- add $tailwind alias to svelte config alias': $tailwind: 'src/lib/theme/app.css'
+- move app.css to src/lib/theme/
+- create files in src/lib/theme/ base utils styles
+- import those files into app.css
+- add defaults to base, add utils to utils, add styles to styles from template files
+- use inter for default font stack above all the normal stack
 
 ---
 
