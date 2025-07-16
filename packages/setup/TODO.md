@@ -13,19 +13,26 @@
 - [x] **Prettier Configuration** - Sets `semi: false` in `.prettierrc`
 - [x] **bits-ui Installation** - Installs bits-ui component library
 - [X] gitignore rules
-
-## 🚧 Planned Features
-
-
-- [ ] sveltekit project setup
+- [X] sveltekit project setup
   - src/hooks folder with hooks.ts, hooks.server.ts, and hooks.client.ts
   - lib/attachments
   - lib/components
-  - lib/ui
-  - lib/server/email
-  - lib/server/db/schema for schema files (drizzle)
   - svelte alias': $utils -> src/lib/utils $ui -> src/lib/components
+- [X] **inter font** - use inter on site
+  - use bun to install @fontsource-variable/inter
+  - import on root layout
 
+## 🚧 Planned Features
+
+- [ ] when adding packages, unless it is needed to configure, just add to package.json and then we run a bun install at end to install all packages at once
+
+- [ ] drizzle setup
+  - lib/server/db/schema for schema files (drizzle)
+  - setup dev/prod setup for sqlite and for postgres
+
+- [ ] setup resend emails and react email
+  - lib/server/email
+  
 ### Auth
 - [ ] **@opensky/auth** - my own auth package
   - not sure what this will look like yet
@@ -38,12 +45,8 @@
   - create files in src/lib/theme/ base utils styles
   - import those files into app.css
   - add defaults to base, add utils to utils, add styles to styles from template files
+  - use inter for default font stack above all the normal stack
 
-- [ ] **inter font** - use inter on site
-  - use bun to install @fontsource-variable/inter
-  - import on root layout
-  - use in default font stack above all the normal stack
-  
 - [ ] **other fonts** - give a list of good fontsource fonts
   - would be best if this were a separate screen in CLI to select from list.
   
