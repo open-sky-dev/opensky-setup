@@ -13,19 +13,23 @@
 - [x] **Prettier Configuration** - Sets `semi: false` in `.prettierrc`
 - [x] **bits-ui Installation** - Installs bits-ui component library
 - [X] gitignore rules
-
-## 🚧 Planned Features
-
-
-- [ ] sveltekit project setup
+- [X] sveltekit project setup
   - src/hooks folder with hooks.ts, hooks.server.ts, and hooks.client.ts
   - lib/attachments
   - lib/components
-  - lib/ui
-  - lib/server/email
-  - lib/server/db/schema for schema files (drizzle)
   - svelte alias': $utils -> src/lib/utils $ui -> src/lib/components
 
+## 🚧 Planned Features
+
+- [ ] when adding packages, unless it is needed to configure, just add to package.json and then we run a bun install at end to install all packages at once
+
+- [ ] drizzle setup
+  - lib/server/db/schema for schema files (drizzle)
+  - setup dev/prod setup for sqlite and for postgres
+
+- [ ] setup resend emails and react email
+  - lib/server/email
+  
 ### Auth
 - [ ] **@opensky/auth** - my own auth package
   - not sure what this will look like yet

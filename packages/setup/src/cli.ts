@@ -6,13 +6,15 @@ import { prettierModule } from './modules/prettier.js';
 import { bitsUiModule } from './modules/bits-ui.js';
 import { gitignoreModule } from './modules/gitignore.js';
 import { sveltekitModule } from './modules/sveltekit.js';
+import { interFontModule } from './modules/inter-font.js';
 import type { SetupModule } from './types.js';
 
 const availableModules: Record<string, SetupModule> = {
   prettier: prettierModule,
   bitsUi: bitsUiModule,
   gitignore: gitignoreModule,
-  sveltekit: sveltekitModule
+  sveltekit: sveltekitModule,
+  interFont: interFontModule
 };
 
 async function main() {
@@ -42,6 +44,11 @@ async function main() {
         value: 'gitignore',
         label: '.gitignore rules',
         hint: 'Add .env, .nova/, .vscode/ rules'
+      },
+      {
+        value: 'interFont',
+        label: 'Inter font',
+        hint: 'Install Inter variable font and import in root layout'
       }
     ]
   });
