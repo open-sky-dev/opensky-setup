@@ -1,0 +1,29 @@
+{
+  "name": "@opensky/setup",
+  "version": "0.1.0",
+  "author": "notnotjake",
+  "description": "Post-scaffold configuration tool for SvelteKit projects",
+  "keywords": ["sveltekit", "cli", "setup", "scaffold"],
+  "type": "module",
+  "bin": {
+    "setup": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "bun build src/cli.ts --outdir=dist --target=node --format=esm",
+    "dev": "bun build src/cli.ts --outdir=dist --target=node --format=esm && node dist/cli.js",
+    "prepublishOnly": "bun run build",
+    "test": "echo 'Tests coming soon'"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "fs-extra": "^11.0.0",
+    "edit-json-file": "^1.8.0",
+    "execa": "^8.0.1",
+    "picocolors": "^1.0.0"
+  },
+  "license": "MIT"
+}
