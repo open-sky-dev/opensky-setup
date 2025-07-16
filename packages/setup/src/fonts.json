@@ -1,0 +1,22 @@
+{
+  "petrona": {
+    "package": "@fontsource-variable/petrona",
+    "label": "Petrona",
+    "hint": "A serif typeface with high contrast and distinctive character"
+  },
+  "jetbrains-mono": {
+    "package": "@fontsource-variable/jetbrains-mono",
+    "label": "JetBrains Mono",
+    "hint": "A monospace font designed for developers"
+  },
+  "crimson-pro": {
+    "package": "@fontsource-variable/crimson-pro",
+    "label": "Crimson Pro",
+    "hint": "A serif font inspired by old-style typefaces"
+  },
+  "libre-baskerville": {
+    "package": "@fontsource/libre-baskerville",
+    "label": "Libre Baskerville",
+    "hint": "A web font optimized for body text"
+  }
+}
