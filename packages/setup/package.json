@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+https://github.com/open-sky-dev/opensky-setup.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "keywords": ["sveltekit", "cli", "setup", "scaffold"],
   "type": "module",
