@@ -1,14 +1,14 @@
 import { SetupModule } from '../types.js';
 import { updateSvelteConfig } from '../utils/svelte-config.js';
 import { createDirectories, moveHookFiles, createDefaultHooks } from '../utils/directories.js';
-import pc from 'picocolors';
+import { log, logGroup } from '../utils/logger.js';
 
 export const sveltekitModule: SetupModule = {
   name: 'sveltekit',
   description: 'Configure SvelteKit project structure and aliases',
   
   async install() {
-    console.log(pc.blue('Setting up SvelteKit project structure...'));
+    log.moduleTitle('Setting up SvelteKit project structure...');
     
     try {
       // Create required directories
@@ -44,26 +44,27 @@ export const sveltekitModule: SetupModule = {
       const totalChanges = createdDirs.length + movedFiles.length + createdHooks.length;
       
       if (totalChanges > 0) {
-        console.log(pc.green(`✓ SvelteKit setup complete (${totalChanges} changes)`));
-        
+        const summaryItems = [];
         if (createdDirs.length > 0) {
-          console.log(pc.gray(`  → Created ${createdDirs.length} directories`));
+          summaryItems.push(`Created ${createdDirs.length} directories`);
         }
         if (movedFiles.length > 0) {
-          console.log(pc.gray(`  → Moved ${movedFiles.length} hook files`));
+          summaryItems.push(`Moved ${movedFiles.length} hook files`);
         }
         if (createdHooks.length > 0) {
-          console.log(pc.gray(`  → Created ${createdHooks.length} default hook files`));
+          summaryItems.push(`Created ${createdHooks.length} default hook files`);
         }
-        console.log(pc.gray('  → Added $ui and $utils aliases'));
-        console.log(pc.gray('  → Configured hooks file paths'));
+        summaryItems.push('Added $ui and $utils aliases');
+        summaryItems.push('Configured hooks file paths');
+        
+        logGroup.summary(`SvelteKit setup complete (${totalChanges} changes)`, summaryItems);
       } else {
-        console.log(pc.gray('→ SvelteKit project already configured'));
+        log.info('SvelteKit project already configured');
       }
       
     } catch (error) {
-      console.error(pc.red('✗ SvelteKit setup failed:'));
-      console.error(pc.red(`  ${error instanceof Error ? error.message : String(error)}`));
+      log.error('SvelteKit setup failed:');
+      log.detail(error instanceof Error ? error.message : String(error));
       throw error;
     }
   }

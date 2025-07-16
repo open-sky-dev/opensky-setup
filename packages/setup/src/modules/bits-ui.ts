@@ -1,6 +1,6 @@
 import { SetupModule } from '../types.js';
 import { installDependencies } from '../utils/dependencies.js';
-import pc from 'picocolors';
+import { log } from '../utils/logger.js';
 
 export const bitsUiModule: SetupModule = {
   name: 'bits-ui',
@@ -8,12 +8,12 @@ export const bitsUiModule: SetupModule = {
   dependencies: ['bits-ui'],
   
   async install() {
-    console.log(pc.blue('Installing bits-ui...'));
+    log.moduleTitle('Installing bits-ui...');
     
     if (this.dependencies) {
       await installDependencies(this.dependencies);
     }
     
-    console.log(pc.green('✓ bits-ui installed successfully'));
+    log.success('bits-ui installed successfully');
   }
 };

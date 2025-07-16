@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { pathExists, ensureDir } from 'fs-extra';
 import path from 'path';
-import pc from 'picocolors';
+import { log } from './logger.js';
 
 export async function createDirectories(dirs: string[], skipPlaceholders: string[] = []): Promise<string[]> {
   const created: string[] = [];
@@ -17,7 +17,7 @@ export async function createDirectories(dirs: string[], skipPlaceholders: string
       }
       
       created.push(dir);
-      console.log(pc.green(`✓ Created directory: ${dir}`));
+      log.success(`Created directory: ${dir}`);
     } else {
       // Directory exists, but let's still check if we need to add placeholder files
       const dirName = path.basename(dir);
@@ -27,7 +27,7 @@ export async function createDirectories(dirs: string[], skipPlaceholders: string
         
         if (!(await pathExists(placeholderPath))) {
           await fs.writeFile(placeholderPath, placeholderFile.content);
-          console.log(pc.gray(`✓ Added ${placeholderFile.name} to existing ${dir}`));
+          log.success(`Added ${placeholderFile.name} to existing ${dir}`);
         }
       }
     }
@@ -43,9 +43,9 @@ async function createDirectoryPlaceholder(dir: string): Promise<void> {
   
   if (!(await pathExists(placeholderPath))) {
     await fs.writeFile(placeholderPath, placeholderFile.content);
-    console.log(pc.gray(`  → Added ${placeholderFile.name}`));
+    log.detail(`Added ${placeholderFile.name}`);
   } else {
-    console.log(pc.gray(`  → ${placeholderFile.name} already exists`));
+    log.detail(`${placeholderFile.name} already exists`);
   }
 }
 
@@ -111,7 +111,7 @@ export async function moveHookFiles(): Promise<string[]> {
     if (!(await pathExists(destPath))) {
       await fs.rename(srcPath, destPath);
       moved.push(`${srcPath} → ${destPath}`);
-      console.log(pc.green(`✓ Moved: ${srcPath} → ${destPath}`));
+      log.success(`Moved: ${srcPath} → ${destPath}`);
     }
   }
   
@@ -160,7 +160,7 @@ export {};
     if (!(await pathExists(filePath))) {
       await fs.writeFile(filePath, hookFile.content);
       created.push(hookFile.name);
-      console.log(pc.green(`✓ Created: ${filePath}`));
+      log.success(`Created: ${filePath}`);
     }
   }
   

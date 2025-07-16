@@ -9,3 +9,4 @@ export * from './utils/json.js';
 export * from './utils/gitignore.js';
 export * from './utils/svelte-config.js';
 export * from './utils/directories.js';
+export * from './utils/logger.js';

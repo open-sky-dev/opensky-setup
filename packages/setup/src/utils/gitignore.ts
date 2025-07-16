@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { pathExists } from 'fs-extra';
-import pc from 'picocolors';
+import { log } from './logger.js';
 
 export interface GitignoreRule {
   pattern: string;
@@ -48,9 +48,9 @@ export async function updateGitignore(rules: GitignoreRule[]): Promise<void> {
     const updatedContent = content + newSection.join('\n') + '\n';
     await fs.writeFile(gitignorePath, updatedContent);
     
-    console.log(pc.green(`✓ Added ${newRules.filter(r => !r.startsWith('#')).length} new rules to .gitignore`));
+    log.success(`Added ${newRules.filter(r => !r.startsWith('#')).length} new rules to .gitignore`);
   } else {
-    console.log(pc.gray('→ All gitignore rules already present'));
+    log.info('All gitignore rules already present');
   }
 }
 

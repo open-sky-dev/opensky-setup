@@ -1,7 +1,7 @@
 import { Project, ObjectLiteralExpression, PropertyAssignment, SyntaxKind, SourceFile, VariableDeclaration } from 'ts-morph';
 import { pathExists } from 'fs-extra';
 import { execa } from 'execa';
-import pc from 'picocolors';
+import { log } from './logger.js';
 
 export interface SvelteConfigAlias {
   [key: string]: string;
@@ -80,9 +80,9 @@ export async function updateSvelteConfig(
     // Format the file
     await formatSvelteConfig(configPath);
     
-    console.log(pc.green('✓ Updated svelte.config.js'));
+    log.success('Updated svelte.config.js');
   } else {
-    console.log(pc.gray('→ svelte.config.js already up to date'));
+    log.info('svelte.config.js already up to date');
   }
 }
 
@@ -150,7 +150,7 @@ async function formatSvelteConfig(configPath: string): Promise<void> {
   try {
     // Try prettier first
     await execa('npx', ['prettier', '--write', configPath], { stdio: 'pipe' });
-    console.log(pc.gray('  → Formatted with prettier'));
+    log.detail('Formatted with prettier');
   } catch (error) {
     // Prettier might not be available, skip silently
   }
@@ -158,7 +158,7 @@ async function formatSvelteConfig(configPath: string): Promise<void> {
   try {
     // Try eslint --fix
     await execa('npx', ['eslint', '--fix', configPath], { stdio: 'pipe' });
-    console.log(pc.gray('  → Linted with eslint'));
+    log.detail('Linted with eslint');
   } catch (error) {
     // ESLint might not be available, skip silently
   }
