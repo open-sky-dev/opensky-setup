@@ -26,15 +26,8 @@ export async function updateSvelteConfig(
   let content = await fs.readFile(configPath, 'utf-8');
   const originalContent = content;
   
-  // Add aliases to kit.alias
-  if (aliases) {
-    content = addAliasesToConfig(content, aliases);
-  }
-  
-  // Add hooks configuration to kit.files.hooks
-  if (hooks) {
-    content = addHooksToConfig(content, hooks);
-  }
+  // Parse and update the config
+  content = updateKitConfig(content, aliases, hooks);
   
   if (content !== originalContent) {
     await fs.writeFile(configPath, content);
@@ -48,89 +41,125 @@ export async function updateSvelteConfig(
   }
 }
 
-function addAliasesToConfig(content: string, aliases: SvelteConfigAlias): string {
-  // Check if kit.alias already exists
-  const kitAliasRegex = /kit:\s*{[^}]*alias:\s*{([^}]*)}/s;
-  const kitRegex = /kit:\s*{([^}]*)}/s;
+function updateKitConfig(
+  content: string, 
+  aliases?: SvelteConfigAlias, 
+  hooks?: SvelteConfigHooks
+): string {
+  // Find the kit object
+  const kitRegex = /kit:\s*{([^{}]*(?:{[^{}]*}[^{}]*)*)}/s;
+  const kitMatch = content.match(kitRegex);
   
-  if (kitAliasRegex.test(content)) {
-    // kit.alias already exists, merge aliases
-    return content.replace(kitAliasRegex, (match, existingAliases) => {
-      const newAliases = Object.entries(aliases)
-        .map(([key, value]) => `${key}: '${value}'`)
-        .join(',\n\t\t\t');
-      
-      const trimmedExisting = existingAliases.trim();
-      const separator = trimmedExisting && !trimmedExisting.endsWith(',') ? ',' : '';
-      
-      return match.replace(existingAliases, `${existingAliases}${separator}\n\t\t\t${newAliases}`);
-    });
-  } else if (kitRegex.test(content)) {
-    // kit exists but no alias, add alias section
-    return content.replace(kitRegex, (match, kitContent) => {
-      const aliasString = Object.entries(aliases)
-        .map(([key, value]) => `\t\t\t${key}: '${value}'`)
-        .join(',\n');
-      
-      const trimmedKit = kitContent.trim();
-      const separator = trimmedKit && !trimmedKit.endsWith(',') ? ',' : '';
-      
-      return match.replace(kitContent, `${kitContent}${separator}\n\t\talias: {\n${aliasString}\n\t\t}`);
-    });
-  } else {
-    // No kit section, add everything
-    const aliasString = Object.entries(aliases)
-      .map(([key, value]) => `\t\t\t${key}: '${value}'`)
-      .join(',\n');
-    
+  if (!kitMatch) {
+    // No kit object exists, create one
+    const newKit = buildKitObject(aliases, hooks);
     return content.replace(
       /export default \{([^}]*)\}/s,
-      `export default {\n\tkit: {\n\t\talias: {\n${aliasString}\n\t\t}\n\t}$1}`
+      `export default {${newKit}$1}`
     );
   }
+  
+  let kitContent = kitMatch[1];
+  
+  // Update alias section
+  if (aliases) {
+    kitContent = updateAliasInKit(kitContent, aliases);
+  }
+  
+  // Update files.hooks section
+  if (hooks) {
+    kitContent = updateFilesHooksInKit(kitContent, hooks);
+  }
+  
+  return content.replace(kitMatch[0], `kit: {${kitContent}}`);
 }
 
-function addHooksToConfig(content: string, hooks: SvelteConfigHooks): string {
-  // Check if kit.files.hooks already exists
-  const kitFilesHooksRegex = /kit:\s*{[^}]*files:\s*{[^}]*hooks:\s*{([^}]*)}/s;
-  const kitFilesRegex = /kit:\s*{[^}]*files:\s*{([^}]*)}/s;
-  const kitRegex = /kit:\s*{([^}]*)}/s;
+function updateAliasInKit(kitContent: string, aliases: SvelteConfigAlias): string {
+  const aliasRegex = /alias:\s*{([^{}]*)}/s;
+  const aliasMatch = kitContent.match(aliasRegex);
   
-  const hooksString = Object.entries(hooks)
+  const aliasEntries = Object.entries(aliases)
     .map(([key, value]) => `\t\t\t${key}: '${value}'`)
     .join(',\n');
   
-  if (kitFilesHooksRegex.test(content)) {
-    // kit.files.hooks already exists, merge
-    return content.replace(kitFilesHooksRegex, (match, existingHooks) => {
-      const trimmedExisting = existingHooks.trim();
-      const separator = trimmedExisting && !trimmedExisting.endsWith(',') ? ',' : '';
+  if (aliasMatch) {
+    // Alias exists, merge with existing
+    const existingAliases = aliasMatch[1].trim();
+    const separator = existingAliases && !existingAliases.endsWith(',') ? ',' : '';
+    
+    return kitContent.replace(
+      aliasMatch[0],
+      `alias: {${existingAliases}${separator}\n${aliasEntries}\n\t\t}`
+    );
+  } else {
+    // No alias, add it
+    const trimmedKit = kitContent.trim();
+    const separator = trimmedKit && !trimmedKit.endsWith(',') ? ',' : '';
+    
+    return `${kitContent}${separator}\n\t\talias: {\n${aliasEntries}\n\t\t}`;
+  }
+}
+
+function updateFilesHooksInKit(kitContent: string, hooks: SvelteConfigHooks): string {
+  const filesRegex = /files:\s*{([^{}]*(?:{[^{}]*}[^{}]*)*)}/s;
+  const filesMatch = kitContent.match(filesRegex);
+  
+  const hooksEntries = Object.entries(hooks)
+    .map(([key, value]) => `\t\t\t\t${key}: '${value}'`)
+    .join(',\n');
+  
+  if (filesMatch) {
+    // files object exists
+    const filesContent = filesMatch[1];
+    const hooksRegex = /hooks:\s*{([^{}]*)}/s;
+    const hooksMatch = filesContent.match(hooksRegex);
+    
+    if (hooksMatch) {
+      // hooks exists in files, merge
+      const existingHooks = hooksMatch[1].trim();
+      const separator = existingHooks && !existingHooks.endsWith(',') ? ',' : '';
       
-      return match.replace(existingHooks, `${existingHooks}${separator}\n${hooksString}`);
-    });
-  } else if (kitFilesRegex.test(content)) {
-    // kit.files exists but no hooks
-    return content.replace(kitFilesRegex, (match, filesContent) => {
+      const newFilesContent = filesContent.replace(
+        hooksMatch[0],
+        `hooks: {${existingHooks}${separator}\n${hooksEntries}\n\t\t\t}`
+      );
+      
+      return kitContent.replace(filesMatch[0], `files: {${newFilesContent}}`);
+    } else {
+      // files exists but no hooks, add hooks
       const trimmedFiles = filesContent.trim();
       const separator = trimmedFiles && !trimmedFiles.endsWith(',') ? ',' : '';
       
-      return match.replace(filesContent, `${filesContent}${separator}\n\t\t\thooks: {\n${hooksString}\n\t\t\t}`);
-    });
-  } else if (kitRegex.test(content)) {
-    // kit exists but no files
-    return content.replace(kitRegex, (match, kitContent) => {
-      const trimmedKit = kitContent.trim();
-      const separator = trimmedKit && !trimmedKit.endsWith(',') ? ',' : '';
-      
-      return match.replace(kitContent, `${kitContent}${separator}\n\t\tfiles: {\n\t\t\thooks: {\n${hooksString}\n\t\t\t}\n\t\t}`);
-    });
+      const newFilesContent = `${filesContent}${separator}\n\t\t\thooks: {\n${hooksEntries}\n\t\t\t}`;
+      return kitContent.replace(filesMatch[0], `files: {${newFilesContent}}`);
+    }
   } else {
-    // No kit section
-    return content.replace(
-      /export default \{([^}]*)\}/s,
-      `export default {\n\tkit: {\n\t\tfiles: {\n\t\t\thooks: {\n${hooksString}\n\t\t\t}\n\t\t}\n\t}$1}`
-    );
+    // No files object, create it with hooks
+    const trimmedKit = kitContent.trim();
+    const separator = trimmedKit && !trimmedKit.endsWith(',') ? ',' : '';
+    
+    return `${kitContent}${separator}\n\t\tfiles: {\n\t\t\thooks: {\n${hooksEntries}\n\t\t\t}\n\t\t}`;
   }
+}
+
+function buildKitObject(aliases?: SvelteConfigAlias, hooks?: SvelteConfigHooks): string {
+  const parts: string[] = [];
+  
+  if (aliases) {
+    const aliasEntries = Object.entries(aliases)
+      .map(([key, value]) => `\t\t\t${key}: '${value}'`)
+      .join(',\n');
+    parts.push(`\t\talias: {\n${aliasEntries}\n\t\t}`);
+  }
+  
+  if (hooks) {
+    const hooksEntries = Object.entries(hooks)
+      .map(([key, value]) => `\t\t\t\t${key}: '${value}'`)
+      .join(',\n');
+    parts.push(`\t\tfiles: {\n\t\t\thooks: {\n${hooksEntries}\n\t\t\t}\n\t\t}`);
+  }
+  
+  return parts.length > 0 ? `\n\tkit: {\n${parts.join(',\n')}\n\t},` : '';
 }
 
 async function formatSvelteConfig(configPath: string): Promise<void> {
