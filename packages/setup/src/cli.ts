@@ -8,7 +8,7 @@ import { gitignoreModule } from './modules/gitignore.js';
 import { sveltekitModule } from './modules/sveltekit.js';
 import { tailwindModule } from './modules/tailwind.js';
 import { drizzleModule } from './modules/drizzle.js';
-import { metaModule } from './modules/meta.js';
+import { seoModule } from './modules/seo.js';
 import { resendModule } from './modules/resend.js';
 import { utilsModule } from './modules/utils.js';
 import { envModule } from './modules/env.js';
@@ -23,7 +23,7 @@ const availableModules: Record<string, SetupModule> = {
   sveltekit: sveltekitModule,
   tailwind: tailwindModule,
   drizzle: drizzleModule,
-  meta: metaModule,
+  seo: seoModule,
   resend: resendModule,
   utils: utilsModule,
   env: envModule
@@ -46,9 +46,9 @@ async function main() {
         hint: 'Project structure, hooks, error page'
       },
       {
-        value: 'prettier',
-        label: 'Prettier',
-        hint: 'Configure prettier rules'
+        value: 'utils',
+        label: 'utils',
+        hint: 'Setups some basic utils'
       },
       {
         value: 'bitsUi',
@@ -56,9 +56,14 @@ async function main() {
         hint: 'Install Bits-ui component library'
       },
       {
-        value: 'gitignore',
-        label: '.gitignore',
-        hint: 'Add .gitignore rules'
+        value: 'resend',
+        label: 'resend email',
+        hint: 'Install resend, react-email and create email utilities'
+      },
+      {
+        value: 'seo',
+        label: 'seo metatags',
+        hint: 'Install and use @opensky/seo'
       },
       {
         value: 'tailwind',
@@ -71,19 +76,14 @@ async function main() {
         hint: 'Configure for Turso/SQLite or Neon'
       },
       {
-        value: 'meta',
-        label: 'metatags seo',
-        hint: 'Install and use sveltekit-meta'
+        value: 'prettier',
+        label: 'Prettier',
+        hint: 'Configure prettier rules'
       },
       {
-        value: 'resend',
-        label: 'resend email',
-        hint: 'Install resend, react-email and create email utilities'
-      },
-      {
-        value: 'utils',
-        label: 'utils',
-        hint: 'Setups some basic utils'
+        value: 'gitignore',
+        label: '.gitignore',
+        hint: 'Add .gitignore rules'
       },
       {
         value: 'env',

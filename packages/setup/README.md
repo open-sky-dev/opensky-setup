@@ -12,15 +12,15 @@ bunx @opensky/setup
 Interactive CLI lets you select which features to configure:
 
 - **SvelteKit** - Project structure, hooks, error page
-- **Prettier** - Code formatting configuration  
+- **Prettier** - Code formatting configuration
 - **Bits UI** - Component library installation
 - **Gitignore** - Essential ignore rules
 - **Tailwind** - Theme structure and CSS organization
 - **Drizzle** - Database setup with schema organization
-- **Meta** - SEO setup with sveltekit-meta
+- **Meta** - SEO setup with @opensky/seo
 - **Resend** - Email service with React Email
 - **Utils** - Utility functions (clsx, tailwind-merge)
-- **Environment** - PUBLIC_* variables setup
+- **Environment** - PUBLIC\_\* variables setup
 
 ## Features
 
