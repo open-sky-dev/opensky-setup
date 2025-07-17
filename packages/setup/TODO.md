@@ -4,46 +4,31 @@
 
 - [ ] email example emails
 
-- [ ] **Neon (PostgreSQL)** 
-  - not sure what kind of setup it required
-- [ ] **upstash redis**: not sure what this would look like
-- [ ] **upstash queue**: not sure what this would look like
+= [ ] pg db
+- [ ] neon pg
+- [ ] upstash redis
+- [ ] upstash qstash
+- [ ] docker: docker compose
+- [ ] deployments: vercel, railway
+- [ ] setup testing
 
-### blocked, come back to these later
-- [ ] **@opensky/auth** - my own auth package
-  - not sure what this will look like yet
-  
-- [ ] **@opensky/ui** - my own component package
-  - in development so waiting here also, but should eventually just be a bun install
+- [ ] @opensky/auth auth package  
+- [ ] @opensky/ui - my own component package
+- [ ] runed components?
 
-### Deployment & DevOps
-- [ ] **Vercel Configuration** - Deploy settings
-  - vercel.json template
-  - Environment variable setup
-- [ ] **Docker Setup** - Containerization
-  - Dockerfile template
-  - docker-compose for development
-
-### Code Quality
-- [ ] **TypeScript Strict Mode** - Enhanced type safety
+#### Package Tasks
 - [ ] **Unit Tests** - Test core functionality
-- [ ] **Integration Tests** - Test full workflows
 - [ ] **Error Handling** - Better error messages and recovery
-
-### error handling
 - [ ] **Configuration Validation** - Check SvelteKit project
 - [ ] **Conflict Detection** - Warn about existing configs
 - [ ] **Rollback Support** - Undo changes if something fails
 - [ ] **Dry Run Mode** - Preview changes without applying
-
-### Performance
 - [ ] **Parallel Installation** - Install multiple packages simultaneously
-- [ ] when adding packages, unless it is needed to configure, just add to package.json and then we run a bun install at end to install all packages at once
-
-- [ ] **Documentation** - Detailed docs for each module
+- [ ] when adding packages, unless it is needed to configure, just add to package.json and then we run a single bun install at end to install all packages at once
 
 ## ✅ Completed Features
 
+- [X] fonts selection
 - [X] **env files** setup for .env, .env.dev, .env.prod, .env.example
 - maybe look into having a tool that 
 - [X] utils
