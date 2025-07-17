@@ -1,0 +1,97 @@
+{
+  "nunito": {
+    "package": "@fontsource-variable/nunito",
+    "label": "Nunito (Variable)",
+    "hint": "sans-serif, rounded: https://fontsource.org/fonts/nunito"
+  },
+  "geist": {
+    "package": "@fontsource-variable/geist",
+    "label": "Geist (Variable)",
+    "hint": "sans-serif: https://fontsource.org/fonts/geist"
+  },
+  "plus-jakarta-sans": {
+    "package": "@fontsource-variable/plus-jakarta-sans",
+    "label": "Plus Jakarta Sans (Variable)",
+    "hint": "sans-serif: https://fontsource.org/fonts/plus-jakarta-sans"
+  },
+  "poppins": {
+    "package": "@fontsource/poppins",
+    "label": "Poppins",
+    "hint": "sans-serif: https://fontsource.org/fonts/poppins"
+  },
+  "montserrat": {
+    "package": "@fontsource-variable/montserrat",
+    "label": "Montserrat (Variable)",
+    "hint": "sans-serif: https://fontsource.org/fonts/montserrat"
+  },
+  "figtree": {
+    "package": "@fontsource-variable/figtree",
+    "label": "Figtree (Variable)",
+    "hint": "sans-serif: https://fontsource.org/fonts/figtree"
+  },
+  "manrope": {
+    "package": "@fontsource-variable/manrope",
+    "label": "Manrope (Variable)",
+    "hint": "sans-serif: https://fontsource.org/fonts/manrope"
+  },
+  "lato": {
+    "package": "@fontsource/lato",
+    "label": "Lato",
+    "hint": "sans-serif: https://fontsource.org/fonts/lato"
+  },
+  "petrona": {
+    "package": "@fontsource-variable/petrona",
+    "label": "Petrona (Variable)",
+    "hint": "serif: https://fontsource.org/fonts/petrona"
+  },
+  "source-serif-pro": {
+    "package": "@fontsource/source-serif-pro",
+    "label": "Source Serif Pro",
+    "hint": "serif: https://fontsource.org/fonts/source-serif-pro"
+  },
+  "source-serif-4": {
+    "package": "@fontsource-variable/source-serif-4",
+    "label": "Source Serif 4 (Variable)",
+    "hint": "serif: https://fontsource.org/fonts/source-serif-4"
+  },
+  "spectral": {
+    "package": "@fontsource/spectral",
+    "label": "Spectral",
+    "hint": "serif: https://fontsource.org/fonts/spectral"
+  },
+  "crimson-pro": {
+    "package": "@fontsource-variable/crimson-pro",
+    "label": "Crimson Pro (Variable)",
+    "hint": "serif: https://fontsource.org/fonts/crimson-pro"
+  },
+  "ibm-plex-mono": {
+    "package": "@fontsource/ibm-plex-mono",
+    "label": "IBM Plex Mono",
+    "hint": "mono: https://fontsource.org/fonts/ibm-plex-mono"
+  },
+  "geist-mono": {
+    "package": "@fontsource-variable/geist-mono",
+    "label": "Geist Mono (Variable)",
+    "hint": "mono: https://fontsource.org/fonts/geist-mono"
+  },
+  "unbounded": {
+    "package": "@fontsource-variable/unbounded",
+    "label": "Unbounded (Variable)",
+    "hint": "display: https://fontsource.org/fonts/unbounded"
+  },
+  "hubot-sans": {
+    "package": "@fontsource-variable/hubot-sans",
+    "label": "Hubot Sans (Variable)",
+    "hint": "display: https://fontsource.org/fonts/hubot-sans"
+  },
+  "mona-sans": {
+    "package": "@fontsource-variable/mona-sans",
+    "label": "Mona Sans (Variable)",
+    "hint": "display: https://fontsource.org/fonts/mona-sans"
+  },
+  "shantell-sans": {
+    "package": "@fontsource-variable/shantell-sans",
+    "label": "Shantell Sans (Variable)",
+    "hint": "display: https://fontsource.org/fonts/shantell-sans"
+  }
+}

@@ -1,8 +1,16 @@
 {
-  "name": "@opensky/setup",
-  "version": "0.1.0",
   "author": "notnotjake",
+  "name": "@opensky/setup",
   "description": "Post-scaffold configuration tool for SvelteKit projects",
+  "repository": {
+    "directory": "packages/setup",
+    "type": "git",
+    "url": "git+https://github.com/open-sky-dev/opensky-setup.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.4.0",
   "keywords": ["sveltekit", "cli", "setup", "scaffold"],
   "type": "module",
   "bin": {
@@ -23,7 +31,8 @@
     "fs-extra": "^11.0.0",
     "edit-json-file": "^1.8.0",
     "execa": "^8.0.1",
-    "picocolors": "^1.0.0"
+    "picocolors": "^1.0.0",
+    "ts-morph": "^21.0.1"
   },
   "license": "MIT"
 }

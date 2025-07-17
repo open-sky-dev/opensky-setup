@@ -1,7 +1,7 @@
-import { promises as fs } from 'fs';
+import { Project, ObjectLiteralExpression, PropertyAssignment, SyntaxKind, SourceFile, VariableDeclaration } from 'ts-morph';
 import { pathExists } from 'fs-extra';
 import { execa } from 'execa';
-import pc from 'picocolors';
+import { log } from './logger.js';
 
 export interface SvelteConfigAlias {
   [key: string]: string;
@@ -15,7 +15,8 @@ export interface SvelteConfigHooks {
 
 export async function updateSvelteConfig(
   aliases?: SvelteConfigAlias,
-  hooks?: SvelteConfigHooks
+  hooks?: SvelteConfigHooks,
+  errorTemplate?: string
 ): Promise<void> {
   const configPath = 'svelte.config.js';
   
@@ -23,121 +24,149 @@ export async function updateSvelteConfig(
     throw new Error('svelte.config.js not found. Are you in a SvelteKit project?');
   }
   
-  let content = await fs.readFile(configPath, 'utf-8');
-  const originalContent = content;
+  const project = new Project();
+  const sourceFile = project.addSourceFileAtPath(configPath);
   
-  // Add aliases to kit.alias
+  // Find the configuration object - handle various patterns
+  const configObjectLiteral = findConfigObject(sourceFile);
+  if (!configObjectLiteral) {
+    throw new Error('Could not find configuration object in svelte.config.js');
+  }
+  
+  // Get or create the kit property
+  const kitProperty = getOrCreateKitProperty(configObjectLiteral);
+  const kitObject = kitProperty.getInitializer() as ObjectLiteralExpression;
+  
+  let hasChanges = false;
+  
+  // Update aliases
   if (aliases) {
-    content = addAliasesToConfig(content, aliases);
-  }
-  
-  // Add hooks configuration to kit.files.hooks
-  if (hooks) {
-    content = addHooksToConfig(content, hooks);
-  }
-  
-  if (content !== originalContent) {
-    await fs.writeFile(configPath, content);
+    const aliasProperty = getOrCreateProperty(kitObject, 'alias');
+    const aliasObject = aliasProperty.getInitializer() as ObjectLiteralExpression;
     
-    // Format the file with prettier and eslint
+    for (const [key, value] of Object.entries(aliases)) {
+      if (!aliasObject.getProperty(key)) {
+        aliasObject.addPropertyAssignment({
+          name: key,
+          initializer: `'${value}'`
+        });
+        hasChanges = true;
+      }
+    }
+  }
+  
+  // Update hooks configuration
+  if (hooks) {
+    const filesProperty = getOrCreateProperty(kitObject, 'files');
+    const filesObject = filesProperty.getInitializer() as ObjectLiteralExpression;
+    
+    const hooksProperty = getOrCreateProperty(filesObject, 'hooks');
+    const hooksObject = hooksProperty.getInitializer() as ObjectLiteralExpression;
+    
+    for (const [key, value] of Object.entries(hooks)) {
+      if (!hooksObject.getProperty(key)) {
+        hooksObject.addPropertyAssignment({
+          name: key,
+          initializer: `'${value}'`
+        });
+        hasChanges = true;
+      }
+    }
+  }
+  
+  // Update error template
+  if (errorTemplate) {
+    const filesProperty = getOrCreateProperty(kitObject, 'files');
+    const filesObject = filesProperty.getInitializer() as ObjectLiteralExpression;
+    
+    const existingErrorTemplate = filesObject.getProperty('errorTemplate');
+    if (!existingErrorTemplate) {
+      filesObject.addPropertyAssignment({
+        name: 'errorTemplate',
+        initializer: `'${errorTemplate}'`
+      });
+      hasChanges = true;
+    }
+  }
+  
+  if (hasChanges) {
+    // Save the file
+    await sourceFile.save();
+    
+    // Format the file
     await formatSvelteConfig(configPath);
     
-    console.log(pc.green('✓ Updated svelte.config.js'));
+    log.success('Updated svelte.config.js');
   } else {
-    console.log(pc.gray('→ svelte.config.js already up to date'));
+    log.info('svelte.config.js already up to date');
   }
 }
 
-function addAliasesToConfig(content: string, aliases: SvelteConfigAlias): string {
-  // Check if kit.alias already exists
-  const kitAliasRegex = /kit:\s*{[^}]*alias:\s*{([^}]*)}/s;
-  const kitRegex = /kit:\s*{([^}]*)}/s;
-  
-  if (kitAliasRegex.test(content)) {
-    // kit.alias already exists, merge aliases
-    return content.replace(kitAliasRegex, (match, existingAliases) => {
-      const newAliases = Object.entries(aliases)
-        .map(([key, value]) => `${key}: '${value}'`)
-        .join(',\n\t\t\t');
-      
-      const trimmedExisting = existingAliases.trim();
-      const separator = trimmedExisting && !trimmedExisting.endsWith(',') ? ',' : '';
-      
-      return match.replace(existingAliases, `${existingAliases}${separator}\n\t\t\t${newAliases}`);
-    });
-  } else if (kitRegex.test(content)) {
-    // kit exists but no alias, add alias section
-    return content.replace(kitRegex, (match, kitContent) => {
-      const aliasString = Object.entries(aliases)
-        .map(([key, value]) => `\t\t\t${key}: '${value}'`)
-        .join(',\n');
-      
-      const trimmedKit = kitContent.trim();
-      const separator = trimmedKit && !trimmedKit.endsWith(',') ? ',' : '';
-      
-      return match.replace(kitContent, `${kitContent}${separator}\n\t\talias: {\n${aliasString}\n\t\t}`);
-    });
-  } else {
-    // No kit section, add everything
-    const aliasString = Object.entries(aliases)
-      .map(([key, value]) => `\t\t\t${key}: '${value}'`)
-      .join(',\n');
+function findConfigObject(sourceFile: SourceFile): ObjectLiteralExpression | null {
+  // Pattern 1: export default { ... }
+  const exportAssignment = sourceFile.getExportAssignment(() => true);
+  if (exportAssignment) {
+    const configObject = exportAssignment.getExpression();
+    if (configObject?.asKind(SyntaxKind.ObjectLiteralExpression)) {
+      return configObject as ObjectLiteralExpression;
+    }
     
-    return content.replace(
-      /export default \{([^}]*)\}/s,
-      `export default {\n\tkit: {\n\t\talias: {\n${aliasString}\n\t\t}\n\t}$1}`
-    );
+    // Pattern 2: export default config; (where config is a variable)
+    if (configObject?.asKind(SyntaxKind.Identifier)) {
+      const identifier = configObject.getText();
+      const variableDeclaration = sourceFile.getVariableDeclaration(identifier);
+      if (variableDeclaration) {
+        const initializer = variableDeclaration.getInitializer();
+        if (initializer?.asKind(SyntaxKind.ObjectLiteralExpression)) {
+          return initializer as ObjectLiteralExpression;
+        }
+      }
+    }
   }
+  
+  // Pattern 3: Look for a variable named 'config' directly
+  const configVar = sourceFile.getVariableDeclaration('config');
+  if (configVar) {
+    const initializer = configVar.getInitializer();
+    if (initializer?.asKind(SyntaxKind.ObjectLiteralExpression)) {
+      return initializer as ObjectLiteralExpression;
+    }
+  }
+  
+  return null;
 }
 
-function addHooksToConfig(content: string, hooks: SvelteConfigHooks): string {
-  // Check if kit.files.hooks already exists
-  const kitFilesHooksRegex = /kit:\s*{[^}]*files:\s*{[^}]*hooks:\s*{([^}]*)}/s;
-  const kitFilesRegex = /kit:\s*{[^}]*files:\s*{([^}]*)}/s;
-  const kitRegex = /kit:\s*{([^}]*)}/s;
+function getOrCreateKitProperty(configObject: ObjectLiteralExpression): PropertyAssignment {
+  let kitProperty = configObject.getProperty('kit');
   
-  const hooksString = Object.entries(hooks)
-    .map(([key, value]) => `\t\t\t${key}: '${value}'`)
-    .join(',\n');
-  
-  if (kitFilesHooksRegex.test(content)) {
-    // kit.files.hooks already exists, merge
-    return content.replace(kitFilesHooksRegex, (match, existingHooks) => {
-      const trimmedExisting = existingHooks.trim();
-      const separator = trimmedExisting && !trimmedExisting.endsWith(',') ? ',' : '';
-      
-      return match.replace(existingHooks, `${existingHooks}${separator}\n${hooksString}`);
+  if (!kitProperty) {
+    kitProperty = configObject.addPropertyAssignment({
+      name: 'kit',
+      initializer: '{}'
     });
-  } else if (kitFilesRegex.test(content)) {
-    // kit.files exists but no hooks
-    return content.replace(kitFilesRegex, (match, filesContent) => {
-      const trimmedFiles = filesContent.trim();
-      const separator = trimmedFiles && !trimmedFiles.endsWith(',') ? ',' : '';
-      
-      return match.replace(filesContent, `${filesContent}${separator}\n\t\t\thooks: {\n${hooksString}\n\t\t\t}`);
-    });
-  } else if (kitRegex.test(content)) {
-    // kit exists but no files
-    return content.replace(kitRegex, (match, kitContent) => {
-      const trimmedKit = kitContent.trim();
-      const separator = trimmedKit && !trimmedKit.endsWith(',') ? ',' : '';
-      
-      return match.replace(kitContent, `${kitContent}${separator}\n\t\tfiles: {\n\t\t\thooks: {\n${hooksString}\n\t\t\t}\n\t\t}`);
-    });
-  } else {
-    // No kit section
-    return content.replace(
-      /export default \{([^}]*)\}/s,
-      `export default {\n\tkit: {\n\t\tfiles: {\n\t\t\thooks: {\n${hooksString}\n\t\t\t}\n\t\t}\n\t}$1}`
-    );
   }
+  
+  return kitProperty as PropertyAssignment;
+}
+
+function getOrCreateProperty(parentObject: ObjectLiteralExpression, propertyName: string): PropertyAssignment {
+  let property = parentObject.getProperty(propertyName);
+  
+  if (!property) {
+    property = parentObject.addPropertyAssignment({
+      name: propertyName,
+      initializer: '{}'
+    });
+  }
+  
+  return property as PropertyAssignment;
 }
 
 async function formatSvelteConfig(configPath: string): Promise<void> {
   try {
     // Try prettier first
     await execa('npx', ['prettier', '--write', configPath], { stdio: 'pipe' });
-    console.log(pc.gray('  → Formatted with prettier'));
+    log.detail('Formatted with prettier');
   } catch (error) {
     // Prettier might not be available, skip silently
   }
@@ -145,7 +174,7 @@ async function formatSvelteConfig(configPath: string): Promise<void> {
   try {
     // Try eslint --fix
     await execa('npx', ['eslint', '--fix', configPath], { stdio: 'pipe' });
-    console.log(pc.gray('  → Linted with eslint'));
+    log.detail('Linted with eslint');
   } catch (error) {
     // ESLint might not be available, skip silently
   }

@@ -1,0 +1,29 @@
+@utility w-full-bleed {
+	width: calc(100% + var(--padding-x) * 2 + 2px) !important;
+	margin-left: calc(-1 * var(--padding-x) - 1px);
+	margin-right: calc(-1 * var(--padding-x) - 1px);
+}
+@utility w-breakout-full {
+	width: calc(100% + var(--padding-x) * 2 + 2px) !important;
+	margin-left: calc(-1 * var(--padding-x) - 1px);
+	margin-right: calc(-1 * var(--padding-x) - 1px);
+}
+@utility w-breakout-* {
+	width: calc(100% + var(--padding-x) * (--value(integer) / 50)) !important;
+	margin-left: calc(var(--padding-x) * (--value(integer) / 100) * -1);
+	margin-right: calc(var(--padding-x) * (--value(integer) / 100) * -1);
+
+	width: calc(100% + (--value([length]) * 2)) !important;
+	margin-left: calc(--value([length]) * -1);
+	margin-right: calc(--value([length]) * -1);
+}
+
+@utility debug {
+	@apply border-1 border-red-500;
+}
+
+@utility debug-* {
+	border-width: 1px;
+	border-style: solid;
+	border-color: --value([color]);
+}

@@ -1,14 +1,77 @@
+import { promises as fs } from 'fs';
+import { pathExists, ensureDir } from 'fs-extra';
+import path from 'path';
 import { SetupModule } from '../types.js';
 import { updateSvelteConfig } from '../utils/svelte-config.js';
-import { createDirectories, moveHookFiles, createDefaultHooks } from '../utils/directories.js';
-import pc from 'picocolors';
+import { createDirectories } from '../utils/directories.js';
+import { copyTemplateFile } from '../utils/templates.js';
+import { log, logGroup } from '../utils/logger.js';
+
+async function setupHooksFromTemplates(): Promise<string[]> {
+  const hooksDir = 'src/hooks';
+  const actions: string[] = [];
+  
+  await ensureDir(hooksDir);
+  
+  // Check for existing hook files in src/
+  const srcFiles = await fs.readdir('src', { withFileTypes: true });
+  const existingHookFiles = srcFiles
+    .filter(file => file.isFile() && file.name.match(/^hooks?\.(ts|js)$/))
+    .map(file => file.name);
+  
+  // Move existing hook files to hooks directory
+  for (const fileName of existingHookFiles) {
+    const srcPath = path.join('src', fileName);
+    const destPath = path.join(hooksDir, fileName);
+    
+    if (!(await pathExists(destPath))) {
+      await fs.rename(srcPath, destPath);
+      actions.push(`Moved: ${srcPath} → ${destPath}`);
+      log.success(`Moved: ${srcPath} → ${destPath}`);
+    }
+  }
+  
+  // Create hook files from templates if they don't exist
+  const hookFiles = ['hooks.server.ts', 'hooks.client.ts', 'hooks.ts'];
+  
+  for (const hookFile of hookFiles) {
+    const filePath = path.join(hooksDir, hookFile);
+    
+    if (!(await pathExists(filePath))) {
+      await copyTemplateFile(`sveltekit/hooks/${hookFile}`, filePath);
+      actions.push(`Created: ${filePath}`);
+      log.success(`Created: ${filePath}`);
+    }
+  }
+  
+  return actions;
+}
+
+async function createErrorPages(): Promise<string[]> {
+  const actions: string[] = [];
+  
+  // Copy error.html template
+  const errorPagePath = 'src/error.html';
+  await copyTemplateFile('sveltekit/error.html', errorPagePath, true);
+  actions.push(`Created: ${errorPagePath}`);
+  log.success(`Created: ${errorPagePath}`);
+  
+  // Copy +error.svelte to routes
+  await ensureDir('src/routes');
+  const errorSveltePath = 'src/routes/+error.svelte';
+  await copyTemplateFile('sveltekit/+error.svelte', errorSveltePath, true);
+  actions.push(`Created: ${errorSveltePath}`);
+  log.success(`Created: ${errorSveltePath}`);
+  
+  return actions;
+}
 
 export const sveltekitModule: SetupModule = {
   name: 'sveltekit',
   description: 'Configure SvelteKit project structure and aliases',
   
   async install() {
-    console.log(pc.blue('Setting up SvelteKit project structure...'));
+    log.moduleTitle('Setting up SvelteKit project structure...');
     
     try {
       // Create required directories
@@ -19,13 +82,13 @@ export const sveltekitModule: SetupModule = {
         'src/lib/utils'
       ];
       
-      const createdDirs = await createDirectories(requiredDirs);
+      const createdDirs = await createDirectories(requiredDirs, ['hooks']);
       
-      // Move existing hook files to src/hooks/
-      const movedFiles = await moveHookFiles();
+      // Setup hooks from templates (move existing or create from templates)
+      const hookActions = await setupHooksFromTemplates();
       
-      // Create default hook files if they don't exist
-      const createdHooks = await createDefaultHooks();
+      // Create error pages
+      const errorPageActions = await createErrorPages();
       
       // Update svelte.config.js with aliases and hooks configuration
       await updateSvelteConfig(
@@ -41,29 +104,30 @@ export const sveltekitModule: SetupModule = {
       );
       
       // Summary output
-      const totalChanges = createdDirs.length + movedFiles.length + createdHooks.length;
+      const totalChanges = createdDirs.length + hookActions.length + errorPageActions.length;
       
       if (totalChanges > 0) {
-        console.log(pc.green(`✓ SvelteKit setup complete (${totalChanges} changes)`));
-        
+        const summaryItems = [];
         if (createdDirs.length > 0) {
-          console.log(pc.gray(`  → Created ${createdDirs.length} directories`));
+          summaryItems.push(`Created ${createdDirs.length} directories`);
         }
-        if (movedFiles.length > 0) {
-          console.log(pc.gray(`  → Moved ${movedFiles.length} hook files`));
+        if (hookActions.length > 0) {
+          summaryItems.push(`${hookActions.length} hook file actions`);
         }
-        if (createdHooks.length > 0) {
-          console.log(pc.gray(`  → Created ${createdHooks.length} default hook files`));
+        if (errorPageActions.length > 0) {
+          summaryItems.push(`${errorPageActions.length} error page files created`);
         }
-        console.log(pc.gray('  → Added $ui and $utils aliases'));
-        console.log(pc.gray('  → Configured hooks file paths'));
+        summaryItems.push('Added $ui and $utils aliases');
+        summaryItems.push('Configured hooks file paths');
+        
+        logGroup.summary(`SvelteKit setup complete (${totalChanges} changes)`, summaryItems);
       } else {
-        console.log(pc.gray('→ SvelteKit project already configured'));
+        log.info('SvelteKit project already configured');
       }
       
     } catch (error) {
-      console.error(pc.red('✗ SvelteKit setup failed:'));
-      console.error(pc.red(`  ${error instanceof Error ? error.message : String(error)}`));
+      log.error('SvelteKit setup failed:');
+      log.detail(error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
