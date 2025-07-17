@@ -42,53 +42,53 @@ async function main() {
     options: [
       {
         value: 'sveltekit',
-        label: 'sveltekit setup',
-        hint: 'Directories, aliases, hooks structure'
+        label: 'SvelteKit',
+        hint: 'Project structure, hooks, error page'
       },
       {
         value: 'prettier',
-        label: 'prettier config',
-        hint: 'Configure Prettier (semi: false)'
+        label: 'Prettier',
+        hint: 'Configure prettier rules'
       },
       {
         value: 'bitsUi',
-        label: 'bits-ui',
-        hint: 'Install bits-ui component library'
+        label: 'Bits-ui',
+        hint: 'Install Bits-ui component library'
       },
       {
         value: 'gitignore',
-        label: '.gitignore rules',
-        hint: 'Add .env, .nova/, .vscode/ rules'
+        label: '.gitignore',
+        hint: 'Add .gitignore rules'
       },
       {
         value: 'tailwind',
-        label: 'tailwind theme structure',
-        hint: 'Move app.css to theme directory with organized imports'
+        label: 'tailwind',
+        hint: 'Organization, utils, and default styles'
       },
       {
         value: 'drizzle',
-        label: 'drizzle database setup',
-        hint: 'Organize schema, add seeds, configure for SQLite or Neon'
+        label: 'drizzle',
+        hint: 'Configure for Turso/SQLite or Neon'
       },
       {
         value: 'meta',
-        label: 'meta/SEO setup',
-        hint: 'Install sveltekit-meta and create load functions'
+        label: 'metatags seo',
+        hint: 'Install and use sveltekit-meta'
       },
       {
         value: 'resend',
-        label: 'resend email service',
+        label: 'resend email',
         hint: 'Install resend, react-email and create email utilities'
       },
       {
         value: 'utils',
-        label: 'utility functions',
-        hint: 'Install clsx, tailwind-merge and copy utility functions'
+        label: 'utils',
+        hint: 'Setups some basic utils'
       },
       {
         value: 'env',
-        label: 'environment variables',
-        hint: 'Add PUBLIC_* variables to all .env files'
+        label: 'env variables',
+        hint: 'Adds several PUBLIC_* variables to all .env files'
       },
     ],
     required: false
