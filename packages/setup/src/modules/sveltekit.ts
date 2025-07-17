@@ -47,13 +47,23 @@ async function setupHooksFromTemplates(): Promise<string[]> {
   return actions;
 }
 
-async function createErrorPage(): Promise<boolean> {
-  const errorPagePath = 'src/error.html';
+async function createErrorPages(): Promise<string[]> {
+  const actions: string[] = [];
   
+  // Copy error.html template
+  const errorPagePath = 'src/error.html';
   await copyTemplateFile('sveltekit/error.html', errorPagePath, true);
+  actions.push(`Created: ${errorPagePath}`);
   log.success(`Created: ${errorPagePath}`);
   
-  return true;
+  // Copy +error.svelte to routes
+  await ensureDir('src/routes');
+  const errorSveltePath = 'src/routes/+error.svelte';
+  await copyTemplateFile('sveltekit/+error.svelte', errorSveltePath, true);
+  actions.push(`Created: ${errorSveltePath}`);
+  log.success(`Created: ${errorSveltePath}`);
+  
+  return actions;
 }
 
 export const sveltekitModule: SetupModule = {
@@ -77,10 +87,10 @@ export const sveltekitModule: SetupModule = {
       // Setup hooks from templates (move existing or create from templates)
       const hookActions = await setupHooksFromTemplates();
       
-      // Create error page
-      const errorPageCreated = await createErrorPage();
+      // Create error pages
+      const errorPageActions = await createErrorPages();
       
-      // Update svelte.config.js with aliases, hooks configuration, and error template
+      // Update svelte.config.js with aliases and hooks configuration
       await updateSvelteConfig(
         {
           '$ui': 'src/lib/components',
@@ -93,15 +103,8 @@ export const sveltekitModule: SetupModule = {
         }
       );
       
-      // Update svelte.config.js to set error template path
-      await updateSvelteConfig(
-        {},
-        {},
-        'src/error.html'
-      );
-      
       // Summary output
-      const totalChanges = createdDirs.length + hookActions.length + (errorPageCreated ? 1 : 0);
+      const totalChanges = createdDirs.length + hookActions.length + errorPageActions.length;
       
       if (totalChanges > 0) {
         const summaryItems = [];
@@ -111,12 +114,11 @@ export const sveltekitModule: SetupModule = {
         if (hookActions.length > 0) {
           summaryItems.push(`${hookActions.length} hook file actions`);
         }
-        if (errorPageCreated) {
-          summaryItems.push('Created error.html template');
+        if (errorPageActions.length > 0) {
+          summaryItems.push(`${errorPageActions.length} error page files created`);
         }
         summaryItems.push('Added $ui and $utils aliases');
         summaryItems.push('Configured hooks file paths');
-        summaryItems.push('Set error template path');
         
         logGroup.summary(`SvelteKit setup complete (${totalChanges} changes)`, summaryItems);
       } else {
