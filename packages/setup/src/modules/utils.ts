@@ -1,8 +1,5 @@
-import { promises as fs } from 'fs';
-import { ensureDir } from 'fs-extra';
-import path from 'path';
 import { log } from '../utils/logger.js';
-import { copyTemplateFiles } from '../utils/templates.js';
+import { copyTemplateDirectory } from '../utils/templates.js';
 import { installDependencies } from '../utils/dependencies.js';
 import type { SetupModule } from '../types.js';
 
@@ -18,13 +15,8 @@ async function installUtilityPackages(): Promise<void> {
 async function copyUtilityFiles(): Promise<void> {
   const utilsDir = 'src/lib/utils';
   
-  await ensureDir(utilsDir);
-  log.detail('Ensured utils directory exists');
-  
-  // Copy known utility files
-  const utilityFiles = ['index.ts', 'cn.ts', 'types.ts'];
-  await copyTemplateFiles('utils', utilsDir, utilityFiles);
-  log.detail('Copied utility files');
+  await copyTemplateDirectory('utils', utilsDir);
+  log.detail('Copied utility files from templates/utils');
 }
 
 export const utilsModule: SetupModule = {
