@@ -5,6 +5,7 @@
 - [ ] email example emails
 
 = [ ] pg db
+
 - [ ] neon pg
 - [ ] upstash redis
 - [ ] upstash qstash
@@ -12,11 +13,12 @@
 - [ ] deployments: vercel, railway
 - [ ] setup testing
 
-- [ ] @opensky/auth auth package  
+- [ ] @opensky/auth auth package
 - [ ] @opensky/ui - my own component package
 - [ ] runed components?
 
 #### Package Tasks
+
 - [ ] **Unit Tests** - Test core functionality
 - [ ] **Error Handling** - Better error messages and recovery
 - [ ] **Configuration Validation** - Check SvelteKit project
@@ -28,29 +30,29 @@
 
 ## ✅ Completed Features
 
-- [X] fonts selection
-- [X] **env files** setup for .env, .env.dev, .env.prod, .env.example
-- maybe look into having a tool that 
-- [X] utils
-- [X] error.html template
-- [X] setup resend emails and react email
+- [x] fonts selection
+- [x] **env files** setup for .env, .env.dev, .env.prod, .env.example
+- maybe look into having a tool that
+- [x] utils
+- [x] error.html template
+- [x] setup resend emails and react email
 - lib/server/email
-- [X] drizzle setup
+- [x] drizzle setup
 - lib/server/db/schema for schema files (drizzle)
 - setup dev/prod setup for sqlite and for postgres
-- [X] **seo/meta** install sveltekit-meta package and setup basic/example usage
+- [x] **seo/meta** install @opensky/seo package and setup basic/example usage
 - [x] **Prettier Configuration** - Sets `semi: false` in `.prettierrc`
 - [x] **bits-ui Installation** - Installs bits-ui component library
-- [X] gitignore rules
-- [X] sveltekit project setup
+- [x] gitignore rules
+- [x] sveltekit project setup
   - src/hooks folder with hooks.ts, hooks.server.ts, and hooks.client.ts
   - lib/attachments
   - lib/components
   - svelte alias': $utils -> src/lib/utils $ui -> src/lib/components
-- [X] **inter font** - use inter on site
+- [x] **inter font** - use inter on site
   - use bun to install @fontsource-variable/inter
   - import on root layout
-- [X] **Tailwind CSS** - configure how i like tailwind to work
+- [x] **Tailwind CSS** - configure how i like tailwind to work
 - create src/lib/theme directory to hold all our tailwind stuff
 - add $tailwind alias to svelte config alias': $tailwind: 'src/lib/theme/app.css'
 - move app.css to src/lib/theme/
@@ -67,4 +69,4 @@
 
 ---
 
-*This roadmap is living document. Features may be added, removed, or reprioritized based on user feedback and usage patterns.*
+_This roadmap is living document. Features may be added, removed, or reprioritized based on user feedback and usage patterns._

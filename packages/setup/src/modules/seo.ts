@@ -5,16 +5,16 @@ import { installDependencies } from '../utils/dependencies.js';
 import type { SetupModule } from '../types.js';
 
 async function installSvelteKitMeta(): Promise<void> {
-  log.detail('Installing sveltekit-meta package...');
-  await installDependencies(['sveltekit-meta']);
-  log.success('sveltekit-meta installed');
+  log.detail('Installing @opensky/seo package...');
+  await installDependencies(['@opensky/seo']);
+  log.success('@opensky/seo installed');
 }
 
 async function createLayoutFile(): Promise<void> {
   const layoutPath = 'src/routes/+layout.ts';
   
   // Always overwrite the layout file to ensure meta setup
-  await copyTemplateFile('meta/+layout.ts', layoutPath, true);
+  await copyTemplateFile('seo/+layout.ts', layoutPath, true);
   log.detail('Created root layout load function');
 }
 
@@ -23,18 +23,18 @@ async function createPageFile(): Promise<void> {
   
   // Only create if it doesn't exist to avoid overwriting existing page logic
   if (!(await pathExists(pagePath))) {
-    await copyTemplateFile('meta/+page.ts', pagePath);
+    await copyTemplateFile('seo/+page.ts', pagePath);
     log.detail('Created home page load function');
   } else {
     log.detail('Home page load function already exists');
   }
 }
 
-export const metaModule: SetupModule = {
+export const seoModule: SetupModule = {
   async install() {
-    log.moduleTitle('Setting up Meta/SEO with sveltekit-meta');
+    log.moduleTitle('Setting up SEO with @opensky/seo');
     
-    // Install sveltekit-meta package
+    // Install @opensky/seo package
     await installSvelteKitMeta();
     
     // Create layout load function
@@ -43,6 +43,6 @@ export const metaModule: SetupModule = {
     // Create page load function
     await createPageFile();
     
-    log.success('Meta/SEO setup complete');
+    log.success('SEO setup complete');
   }
 };
