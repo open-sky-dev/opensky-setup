@@ -86,9 +86,13 @@ async function setupDatabaseFiles(dbType: 'drizzle' | 'neon'): Promise<void> {
   await copyTemplateFile(`db/${dbType}/index.ts`, path.join(dbDir, 'index.ts'), true);
   log.detail(`Updated database connection for ${dbType}`);
   
-  // Copy drizzle.config.ts (force overwrite)
+  // Copy drizzle.config.ts (dev config, force overwrite)
   await copyTemplateFile(`db/${dbType}/drizzle.config.ts`, 'drizzle.config.ts', true);
-  log.detail(`Updated drizzle.config.ts for ${dbType}`);
+  log.detail(`Updated drizzle.config.ts (dev) for ${dbType}`);
+  
+  // Copy drizzle-prod.config.ts (prod config, force overwrite)
+  await copyTemplateFile(`db/${dbType}/drizzle-prod.config.ts`, 'drizzle-prod.config.ts', true);
+  log.detail(`Updated drizzle-prod.config.ts (prod) for ${dbType}`);
   
   // Copy reset.ts to root db/ directory (only for drizzle)
   if (dbType === 'drizzle') {
@@ -100,7 +104,13 @@ async function setupDatabaseFiles(dbType: 'drizzle' | 'neon'): Promise<void> {
 async function updatePackageJsonScripts(): Promise<void> {
   await editJson('package.json', {
     'scripts.db:gen': 'drizzle-kit generate',
-    'scripts.db:reset': 'bun run db/reset.ts'
+    'scripts.db:migrate': 'drizzle-kit migrate',
+    'scripts.db:push': 'drizzle-kit push',
+    'scripts.db:studio': 'drizzle-kit studio',
+    'scripts.db:reset': 'bun run db/reset.ts',
+    'scripts.prod:db:gen': 'drizzle-kit generate --config=drizzle-prod.config.ts',
+    'scripts.prod:db:migrate': 'drizzle-kit migrate --config=drizzle-prod.config.ts',
+    'scripts.prod:db:studio': 'drizzle-kit studio --config=drizzle-prod.config.ts'
   });
   
   log.detail('Added database scripts to package.json');
