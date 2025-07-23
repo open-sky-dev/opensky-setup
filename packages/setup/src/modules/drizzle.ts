@@ -4,7 +4,7 @@ import path from 'path';
 import { log } from '../utils/logger.js';
 import { copyTemplateFile } from '../utils/templates.js';
 import { editJson } from '../utils/json.js';
-import { updateEnvFile, createEnvFile, getDevEnvVariables, getProdEnvVariables } from '../utils/env.js';
+import { updateEnvFile, createEnvFile, getDevEnvVariables, getProdEnvVariables, getPublicEnvVariables } from '../utils/env.js';
 import { updateGitignore } from '../utils/gitignore.js';
 import type { SetupModule } from '../types.js';
 
@@ -118,16 +118,19 @@ async function updatePackageJsonScripts(): Promise<void> {
 }
 
 async function setupEnvironmentFiles(dbType: 'drizzle' | 'neon'): Promise<void> {
+  // Get PUBLIC variables to include in all env files
+  const publicVariables = getPublicEnvVariables();
+  
   // Update .env file with development variables (remove old DB vars and add new ones)
-  const devVariables = getDevEnvVariables(dbType);
-  await updateEnvFile('.env', devVariables, ['DATABASE*', 'DB*']);
+  const devVariables = [...publicVariables, ...getDevEnvVariables(dbType)];
+  await updateEnvFile('.env', devVariables, ['DATABASE*', 'DB*', 'PUBLIC_*']);
   log.detail('Updated .env file with development database variables');
   
   // Create .env.example with development variables
   await createEnvFile('.env.example', devVariables);
   
   // Create .env.prod with production variables
-  const prodVariables = getProdEnvVariables(dbType);
+  const prodVariables = [...publicVariables, ...getProdEnvVariables(dbType)];
   await createEnvFile('.env.prod', prodVariables);
 }
 
