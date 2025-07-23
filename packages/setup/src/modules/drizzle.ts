@@ -62,10 +62,22 @@ async function setupSchemaDirectory(): Promise<void> {
       log.detail('Schema index.ts already exists');
     }
   } else {
-    // Create empty schema index if it doesn't exist
+    // Create schema index with barrel export template if it doesn't exist
     if (!(await pathExists(newSchemaPath))) {
-      await fs.writeFile(newSchemaPath, '// Database schema definitions\nexport {};\n');
-      log.detail('Created empty schema/index.ts');
+      const schemaTemplate = `// Database schema definitions
+// Export all your schema tables from this file
+
+// Example:
+// export * from './users'
+// export * from './posts'
+// export * from './comments'
+
+// Or if you have everything in this file:
+// export const users = sqliteTable('users', { ... })
+// export const posts = sqliteTable('posts', { ... })
+`;
+      await fs.writeFile(newSchemaPath, schemaTemplate);
+      log.detail('Created schema/index.ts with barrel export template');
     }
   }
 }
