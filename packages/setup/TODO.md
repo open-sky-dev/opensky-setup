@@ -4,9 +4,11 @@
 
 - [ ] email example emails
 
-= [ ] pg db
+- [ ] pg db
+- [ ] neon db
+- [ ] plain sqlite db
+- [ ] error handling if you did not setup project database with `sv create`
 
-- [ ] neon pg
 - [ ] upstash redis
 - [ ] upstash qstash
 - [ ] docker: docker compose

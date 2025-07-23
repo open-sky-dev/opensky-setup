@@ -5,6 +5,7 @@ import { log } from '../utils/logger.js';
 import { copyTemplateFile } from '../utils/templates.js';
 import { editJson } from '../utils/json.js';
 import { updateEnvFile, createEnvFile, getDevEnvVariables, getProdEnvVariables } from '../utils/env.js';
+import { updateGitignore } from '../utils/gitignore.js';
 import type { SetupModule } from '../types.js';
 
 async function detectDrizzleType(): Promise<'drizzle' | 'neon' | null> {
@@ -162,6 +163,17 @@ export const drizzleModule: SetupModule = {
     
     // Setup environment files
     await setupEnvironmentFiles(dbType);
+    
+    // Update .gitignore to exclude SQLite database files
+    if (dbType === 'drizzle') {
+      await updateGitignore([
+        {
+          pattern: 'db/dev.db*',
+          comment: 'SQLite database files'
+        }
+      ]);
+      log.detail('Added SQLite database files to .gitignore');
+    }
     
     log.success('Drizzle database structure configured');
   }
