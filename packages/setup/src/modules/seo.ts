@@ -40,15 +40,15 @@ async function updateLayoutSvelte(): Promise<void> {
   }
   
   let content = await fs.readFile(layoutPath, 'utf-8');
-  const importStatement = `import { MetaTags } from '@opensky/seo'`;
-  const metaTagsComponent = '<MetaTags />';
+  const importStatement = `import { SeoTags } from '@opensky/seo'`;
+  const seoTagsComponent = '<SeoTags />';
   
   // Check if import already exists
   const hasImport = content.includes(importStatement) || content.includes("from '@opensky/seo'");
-  const hasComponent = content.includes(metaTagsComponent);
+  const hasComponent = content.includes(seoTagsComponent);
   
   if (hasImport && hasComponent) {
-    log.detail('MetaTags already configured in root layout');
+    log.detail('SeoTags already configured in root layout');
     return;
   }
   
@@ -82,27 +82,27 @@ async function updateLayoutSvelte(): Promise<void> {
       content = `<script lang="ts">\n\t${importStatement}\n</script>\n\n${content}`;
     }
     
-    log.detail('Added MetaTags import to root layout');
+    log.detail('Added SeoTags import to root layout');
   }
   
-  // Add MetaTags component if needed
+  // Add SeoTags component if needed
   if (!hasComponent) {
-    // Find where to insert MetaTags - before the first element/component or children render
+    // Find where to insert SeoTags - before the first element/component or children render
     const childrenRenderMatch = content.match(/\{@render\s+children\(\)\}/);
     
     if (childrenRenderMatch) {
       const insertIndex = childrenRenderMatch.index!;
-      content = content.substring(0, insertIndex) + metaTagsComponent + '\n\n' + content.substring(insertIndex);
+      content = content.substring(0, insertIndex) + seoTagsComponent + '\n\n' + content.substring(insertIndex);
     } else {
       // If no children render found, add after the script tag
       const scriptEndMatch = content.match(/<\/script>\s*/);
       if (scriptEndMatch) {
         const insertIndex = scriptEndMatch.index! + scriptEndMatch[0].length;
-        content = content.substring(0, insertIndex) + '\n' + metaTagsComponent + '\n' + content.substring(insertIndex);
+        content = content.substring(0, insertIndex) + '\n' + seoTagsComponent + '\n' + content.substring(insertIndex);
       }
     }
     
-    log.detail('Added MetaTags component to root layout');
+    log.detail('Added SeoTags component to root layout');
   }
   
   await fs.writeFile(layoutPath, content);
@@ -121,7 +121,7 @@ export const seoModule: SetupModule = {
     // Create page load function
     await createPageFile();
     
-    // Update +layout.svelte with MetaTags
+    // Update +layout.svelte with SeoTags
     await updateLayoutSvelte();
     
     log.success('SEO setup complete');
