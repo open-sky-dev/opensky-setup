@@ -2,17 +2,17 @@
 
 ## 🚧 Planned Features
 
-- [ ] resend email
-  - options for adding templates 
+- [ ] env inconsistencies: resend is not everywhere, DB_AUTH is not everywhere
+- 
+
+- [ ] upstash redis
 - [ ] rate limiting
-- [ ] drizzle config
-  - postgres configuration: pg or neon
-  - sqlite configuration: plain or with turso
+- [ ] view transitions: util, tailwind globals
+
+- [ ] feedback ui components
 
 - [ ] docker: docker dev container
-- [ ] upstash redis
 - [ ] setup testing
-- [ ] view transitions: util, tailwind globals
 
 - [ ] @opensky/auth auth package
 - [ ] @opensky/ui - my own component package
@@ -31,6 +31,11 @@
 
 ## ✅ Completed Features
 
+- [X] drizzle config
+  - postgres configuration: pg or neon
+  - sqlite configuration: plain or with turso
+- [X] resend email
+  - options for adding templates 
 - [X] @opensky/styles package instead of utils
 - [X] tabler icons
 - [x] fonts selection

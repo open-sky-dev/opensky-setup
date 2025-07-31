@@ -143,9 +143,36 @@ async function main() {
     }
   }
 
-  // Step 3: UI
+  // Conditional sub-step: Drizzle Database Type
+  let drizzleDbType: string = '';
+  if (coreModules.includes('drizzle')) {
+    const dbTypeSelection = await p.select({
+      message: 'Select your database setup:',
+      options: [
+        {
+          value: 'sqlite-turso',
+          label: 'SQLite + Turso',
+          hint: 'Local SQLite for development, Turso for production'
+        },
+        {
+          value: 'postgres',
+          label: 'PostgreSQL/Neon',
+          hint: 'PostgreSQL database (local, hosted, or Neon)'
+        }
+      ]
+    });
+
+    if (p.isCancel(dbTypeSelection)) {
+      p.cancel('Operation cancelled.');
+      process.exit(0);
+    }
+
+    drizzleDbType = dbTypeSelection;
+  }
+
+  // Step 3: UI Components
   const uiModules = await p.multiselect({
-    message: 'Step 3: UI (press a for all):',
+    message: 'Step 3: UI Components (press a for all):',
     options: [
       {
         value: 'bitsUi',
@@ -156,16 +183,6 @@ async function main() {
         value: 'tablerIcons',
         label: 'tabler-icons',
         hint: 'Install @tabler/icons-svelte icon library'
-      },
-      {
-        value: 'inter',
-        label: 'Inter Font',
-        hint: 'Variable font with automatic layout integration'
-      },
-      {
-        value: 'otherFonts',
-        label: 'other fonts',
-        hint: 'Choose from additional font options'
       }
     ],
     required: false
@@ -176,12 +193,35 @@ async function main() {
     process.exit(0);
   }
 
-  // Step 4: Additional Fonts (conditional)
+  // Step 4: Fonts
+  const fontSelection = await p.multiselect({
+    message: 'Step 4: Fonts (press a for all):',
+    options: [
+      {
+        value: 'inter',
+        label: 'Inter Font',
+        hint: 'Variable font with automatic layout integration'
+      },
+      {
+        value: 'moreFonts',
+        label: 'More fonts',
+        hint: 'Choose from additional font options'
+      }
+    ],
+    required: false
+  });
+
+  if (p.isCancel(fontSelection)) {
+    p.cancel('Operation cancelled.');
+    process.exit(0);
+  }
+
+  // Step 5: Additional Fonts (conditional)
   let additionalFonts: string[] = [];
-  if (uiModules.includes('otherFonts')) {
+  if (fontSelection.includes('moreFonts')) {
     const fontOptions = getFontOptions();
     additionalFonts = await p.multiselect({
-      message: 'Step 4: Select Additional Fonts (press a for all):',
+      message: 'Step 5: Select Additional Fonts (press a for all):',
       options: fontOptions,
       required: false
     });
@@ -192,11 +232,11 @@ async function main() {
     }
   }
 
-  // Combine all selected modules (excluding font-related items)
+  // Combine all selected modules
   const allSelectedModules = [
     ...configModules,
     ...coreModules,
-    ...uiModules.filter(item => !['inter', 'otherFonts'].includes(item))
+    ...uiModules
   ];
 
   // Install selected modules
@@ -208,9 +248,11 @@ async function main() {
       for (const moduleKey of allSelectedModules) {
         const module = availableModules[moduleKey];
         if (module) {
-          // Pass template selections to resend module
+          // Pass options to modules that need them
           if (moduleKey === 'resend' && resendTemplates.length > 0) {
             await module.install(resendTemplates);
+          } else if (moduleKey === 'drizzle' && drizzleDbType) {
+            await module.install(drizzleDbType);
           } else {
             await module.install();
           }
@@ -227,7 +269,7 @@ async function main() {
 
   // Install fonts
   const allSelectedFonts = [
-    ...(uiModules.includes('inter') ? ['inter'] : []),
+    ...(fontSelection.includes('inter') ? ['inter'] : []),
     ...additionalFonts
   ];
 
