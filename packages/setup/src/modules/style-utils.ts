@@ -4,16 +4,16 @@ import { log } from '../utils/logger.js';
 
 export const styleUtilsModule: SetupModule = {
   name: 'style-utils',
-  description: 'Install @opensky/styles utility package',
-  dependencies: ['@opensky/styles'],
+  description: 'Install @opensky/style utility package',
+  dependencies: ['@opensky/style'],
   
   async install() {
-    log.moduleTitle('Installing @opensky/styles...');
+    log.moduleTitle('Installing @opensky/style...');
     
     if (this.dependencies) {
       await installDependencies(this.dependencies);
     }
     
-    log.success('@opensky/styles installed successfully');
+    log.success('@opensky/style installed successfully');
   }
 };

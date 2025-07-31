@@ -3,7 +3,7 @@ export interface SetupModule {
   description: string;
   dependencies?: string[];
   devDependencies?: string[];
-  install(): Promise<void>;
+  install(options?: any): Promise<void>;
 }
 
 export interface SetupConfig {

@@ -91,7 +91,7 @@ async function main() {
       {
         value: 'styleUtils',
         label: 'Style Utils',
-        hint: 'Install @opensky/styles utility package'
+        hint: 'Install @opensky/style utility package'
       },
       {
         value: 'resend',
@@ -115,6 +115,32 @@ async function main() {
   if (p.isCancel(coreModules)) {
     p.cancel('Operation cancelled.');
     process.exit(0);
+  }
+
+  // Conditional sub-step: Resend Email Templates
+  let resendTemplates: string[] = [];
+  if (coreModules.includes('resend')) {
+    resendTemplates = await p.multiselect({
+      message: 'Resend Email Templates (press a for all):',
+      options: [
+        {
+          value: 'account',
+          label: 'Account Templates',
+          hint: 'Email verification, password reset, account alerts'
+        },
+        {
+          value: 'payments',
+          label: 'Payment Templates', 
+          hint: 'Invoices, receipts, subscription notifications'
+        }
+      ],
+      required: false
+    });
+
+    if (p.isCancel(resendTemplates)) {
+      p.cancel('Operation cancelled.');
+      process.exit(0);
+    }
   }
 
   // Step 3: UI
@@ -182,7 +208,12 @@ async function main() {
       for (const moduleKey of allSelectedModules) {
         const module = availableModules[moduleKey];
         if (module) {
-          await module.install();
+          // Pass template selections to resend module
+          if (moduleKey === 'resend' && resendTemplates.length > 0) {
+            await module.install(resendTemplates);
+          } else {
+            await module.install();
+          }
         }
       }
       
