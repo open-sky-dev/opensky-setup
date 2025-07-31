@@ -2,18 +2,17 @@
 
 ## 🚧 Planned Features
 
-- [ ] email example emails
+- [ ] resend email
+  - options for adding templates 
+- [ ] rate limiting
+- [ ] drizzle config
+  - postgres configuration: pg or neon
+  - sqlite configuration: plain or with turso
 
-- [ ] pg db
-- [ ] neon db
-- [ ] plain sqlite db
-- [ ] error handling if you did not setup project database with `sv create`
-
+- [ ] docker: docker dev container
 - [ ] upstash redis
-- [ ] upstash qstash
-- [ ] docker: docker compose
-- [ ] deployments: vercel, railway
 - [ ] setup testing
+- [ ] view transitions: util, tailwind globals
 
 - [ ] @opensky/auth auth package
 - [ ] @opensky/ui - my own component package
@@ -32,6 +31,8 @@
 
 ## ✅ Completed Features
 
+- [X] @opensky/styles package instead of utils
+- [X] tabler icons
 - [x] fonts selection
 - [x] **env files** setup for .env, .env.dev, .env.prod, .env.example
 - maybe look into having a tool that
