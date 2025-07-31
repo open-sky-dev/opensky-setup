@@ -2,9 +2,6 @@
 
 ## 🚧 Planned Features
 
-- [ ] env inconsistencies: resend is not everywhere, DB_AUTH is not everywhere
-- 
-
 - [ ] upstash redis
 - [ ] rate limiting
 - [ ] view transitions: util, tailwind globals
