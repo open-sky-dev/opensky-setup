@@ -8,40 +8,15 @@ import { copyTemplateFile } from '../utils/templates.js';
 import { log, logGroup } from '../utils/logger.js';
 
 async function setupHooksFromTemplates(): Promise<string[]> {
-  const hooksDir = 'src/hooks';
   const actions: string[] = [];
   
-  await ensureDir(hooksDir);
+  // Create hooks.server.ts from template if it doesn't exist
+  const hooksServerPath = 'src/hooks.server.ts';
   
-  // Check for existing hook files in src/
-  const srcFiles = await fs.readdir('src', { withFileTypes: true });
-  const existingHookFiles = srcFiles
-    .filter(file => file.isFile() && file.name.match(/^hooks?\.(ts|js)$/))
-    .map(file => file.name);
-  
-  // Move existing hook files to hooks directory
-  for (const fileName of existingHookFiles) {
-    const srcPath = path.join('src', fileName);
-    const destPath = path.join(hooksDir, fileName);
-    
-    if (!(await pathExists(destPath))) {
-      await fs.rename(srcPath, destPath);
-      actions.push(`Moved: ${srcPath} → ${destPath}`);
-      log.success(`Moved: ${srcPath} → ${destPath}`);
-    }
-  }
-  
-  // Create hook files from templates if they don't exist
-  const hookFiles = ['hooks.server.ts', 'hooks.client.ts', 'hooks.ts'];
-  
-  for (const hookFile of hookFiles) {
-    const filePath = path.join(hooksDir, hookFile);
-    
-    if (!(await pathExists(filePath))) {
-      await copyTemplateFile(`sveltekit/hooks/${hookFile}`, filePath);
-      actions.push(`Created: ${filePath}`);
-      log.success(`Created: ${filePath}`);
-    }
+  if (!(await pathExists(hooksServerPath))) {
+    await copyTemplateFile('sveltekit/hooks/hooks.server.ts', hooksServerPath);
+    actions.push(`Created: ${hooksServerPath}`);
+    log.success(`Created: ${hooksServerPath}`);
   }
   
   return actions;
@@ -76,13 +51,12 @@ export const sveltekitModule: SetupModule = {
     try {
       // Create required directories
       const requiredDirs = [
-        'src/hooks',
         'src/lib/attachments',
         'src/lib/components',
         'src/lib/utils'
       ];
       
-      const createdDirs = await createDirectories(requiredDirs, ['hooks']);
+      const createdDirs = await createDirectories(requiredDirs);
       
       // Setup hooks from templates (move existing or create from templates)
       const hookActions = await setupHooksFromTemplates();
@@ -90,16 +64,11 @@ export const sveltekitModule: SetupModule = {
       // Create error pages
       const errorPageActions = await createErrorPages();
       
-      // Update svelte.config.js with aliases and hooks configuration
+      // Update svelte.config.js with aliases
       await updateSvelteConfig(
         {
           '$ui': 'src/lib/components',
           '$utils': 'src/lib/utils'
-        },
-        {
-          server: 'src/hooks/hooks.server',
-          client: 'src/hooks/hooks.client', 
-          universal: 'src/hooks/hooks'
         }
       );
       
@@ -118,7 +87,6 @@ export const sveltekitModule: SetupModule = {
           summaryItems.push(`${errorPageActions.length} error page files created`);
         }
         summaryItems.push('Added $ui and $utils aliases');
-        summaryItems.push('Configured hooks file paths');
         
         logGroup.summary(`SvelteKit setup complete (${totalChanges} changes)`, summaryItems);
       } else {
