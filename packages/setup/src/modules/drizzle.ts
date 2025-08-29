@@ -82,9 +82,6 @@ async function setupSqliteTurso(): Promise<void> {
   await copyTemplateFile('db/sqlite-turso/drizzle.config.ts', 'drizzle.config.ts', true);
   log.detail('Updated drizzle.config.ts for SQLite + Turso');
   
-  // Copy drizzle-prod.config.ts (prod config, force overwrite)
-  await copyTemplateFile('db/sqlite-turso/drizzle-prod.config.ts', 'drizzle-prod.config.ts', true);
-  log.detail('Updated drizzle-prod.config.ts for SQLite + Turso');
 }
 
 // PostgreSQL/Neon: Make surgical edits to existing files
@@ -161,10 +158,7 @@ async function updatePackageJsonScripts(dbType: DbType): Promise<void> {
       ...baseScripts,
       'scripts.db:migrate': 'drizzle-kit migrate',
       'scripts.db:push': 'drizzle-kit push',
-      'scripts.db:studio': 'drizzle-kit studio',
-      'scripts.prod:db:gen': 'drizzle-kit generate --config=drizzle-prod.config.ts',
-      'scripts.prod:db:migrate': 'drizzle-kit migrate --config=drizzle-prod.config.ts',
-      'scripts.prod:db:studio': 'drizzle-kit studio --config=drizzle-prod.config.ts'
+      'scripts.db:studio': 'drizzle-kit studio'
     });
   } else {
     // Add basic scripts for PostgreSQL/Neon

@@ -43,20 +43,17 @@ export async function addResendAuthToEnvFiles(): Promise<void> {
     key: 'RESEND_AUTH',
     value: ''
   };
-
-  // Get PUBLIC variables for files that don't exist yet
-  const publicVariables = getPublicEnvVariables();
   
   // Add to .env (development) - preserve existing variables
   if (!(await pathExists('.env'))) {
-    await createEnvFile('.env', [...publicVariables, resendVar]);
+    await createEnvFile('.env', [resendVar]);
   } else {
     await updateEnvFile('.env', [resendVar], []);
   }
   
   // Add to .env.example - preserve existing and add missing template vars
   if (!(await pathExists('.env.example'))) {
-    await createEnvFile('.env.example', [...publicVariables, resendVar]);
+    await createEnvFile('.env.example', [resendVar]);
   } else {
     // Parse existing and ensure all our template vars are present
     const existingVars = await parseEnvFile('.env.example');
@@ -67,42 +64,7 @@ export async function addResendAuthToEnvFiles(): Promise<void> {
       mergedVars.push(resendVar);
     }
     
-    // Add any missing public vars
-    for (const publicVar of publicVariables) {
-      if (!existingVars.find(v => v.key === publicVar.key)) {
-        mergedVars.push(publicVar);
-      }
-    }
-    
     await updateEnvFile('.env.example', mergedVars, []);
-  }
-  
-  // Add to .env.prod (production) - preserve existing and add missing
-  if (!(await pathExists('.env.prod'))) {
-    await createEnvFile('.env.prod', [...publicVariables, resendVar]);
-  } else {
-    // Parse existing and ensure all our template vars are present
-    const existingVars = await parseEnvFile('.env.prod');
-    const mergedVars = [...existingVars];
-    
-    // Add RESEND_AUTH if missing
-    if (!existingVars.find(v => v.key === 'RESEND_AUTH')) {
-      mergedVars.push(resendVar);
-    }
-    
-    // Add NODE_ENV if missing
-    if (!existingVars.find(v => v.key === 'NODE_ENV')) {
-      mergedVars.push({ key: 'NODE_ENV', value: 'production' });
-    }
-    
-    // Add any missing public vars
-    for (const publicVar of publicVariables) {
-      if (!existingVars.find(v => v.key === publicVar.key)) {
-        mergedVars.push(publicVar);
-      }
-    }
-    
-    await updateEnvFile('.env.prod', mergedVars, []);
   }
 }
 
@@ -140,51 +102,36 @@ export async function updateEnvFile(
   
   // Group variables by type
   const nodeEnvVar = existingVars.filter(v => v.key === 'NODE_ENV');
-  const dbVars = existingVars.filter(v => v.key.startsWith('DB_') || v.key === 'DATABASE_URL');
-  const serviceVars = existingVars.filter(v => 
-    !v.key.startsWith('PUBLIC_') && 
-    !v.key.startsWith('DB_') && 
-    v.key !== 'DATABASE_URL' && 
-    v.key !== 'NODE_ENV'
+  const dbVars = existingVars.filter(v => 
+    v.key.startsWith('DB') || 
+    v.key.startsWith('DATABASE') || 
+    v.key.startsWith('PG')
   );
-  const publicVars = existingVars.filter(v => v.key.startsWith('PUBLIC_'));
+  const serviceVars = existingVars.filter(v => 
+    v.key !== 'NODE_ENV' &&
+    !v.key.startsWith('DB') && 
+    !v.key.startsWith('DATABASE') && 
+    !v.key.startsWith('PG')
+  );
   
   // Generate content with sections
   const sections: string[] = [];
   
-  // NODE_ENV first
+  // NODE_ENV first (no header, just the variable)
   if (nodeEnvVar.length > 0) {
-    sections.push('# Environment\n' + 
-      nodeEnvVar.map(v => `${v.key}=${v.value}`).join('\n'));
+    sections.push(nodeEnvVar.map(v => `${v.key}=${v.value}`).join('\n'));
   }
   
-  // Database configuration
+  // Database configuration second
   if (dbVars.length > 0) {
     sections.push('# Database\n' +
       dbVars.map(v => `${v.key}=${v.value}`).join('\n'));
   }
   
-  // Other services (like RESEND_AUTH)
+  // Services third
   if (serviceVars.length > 0) {
-    // Group by service type
-    const resendVars = serviceVars.filter(v => v.key.startsWith('RESEND_'));
-    const otherServiceVars = serviceVars.filter(v => !v.key.startsWith('RESEND_'));
-    
-    if (resendVars.length > 0) {
-      sections.push('# Email Service\n' +
-        resendVars.map(v => `${v.key}=${v.value}`).join('\n'));
-    }
-    
-    if (otherServiceVars.length > 0) {
-      sections.push('# Services\n' +
-        otherServiceVars.map(v => `${v.key}=${v.value}`).join('\n'));
-    }
-  }
-  
-  // Public variables last
-  if (publicVars.length > 0) {
-    sections.push('# Public Variables\n' + 
-      publicVars.map(v => `${v.key}=${v.value}`).join('\n'));
+    sections.push('# Services\n' +
+      serviceVars.map(v => `${v.key}=${v.value}`).join('\n'));
   }
   
   const content = sections.join('\n\n');
@@ -194,51 +141,36 @@ export async function updateEnvFile(
 export async function createEnvFile(filePath: string, variables: EnvVariable[]): Promise<void> {
   // Group variables by type
   const nodeEnvVar = variables.filter(v => v.key === 'NODE_ENV');
-  const dbVars = variables.filter(v => v.key.startsWith('DB_') || v.key === 'DATABASE_URL');
-  const serviceVars = variables.filter(v => 
-    !v.key.startsWith('PUBLIC_') && 
-    !v.key.startsWith('DB_') && 
-    v.key !== 'DATABASE_URL' && 
-    v.key !== 'NODE_ENV'
+  const dbVars = variables.filter(v => 
+    v.key.startsWith('DB') || 
+    v.key.startsWith('DATABASE') || 
+    v.key.startsWith('PG')
   );
-  const publicVars = variables.filter(v => v.key.startsWith('PUBLIC_'));
+  const serviceVars = variables.filter(v => 
+    v.key !== 'NODE_ENV' &&
+    !v.key.startsWith('DB') && 
+    !v.key.startsWith('DATABASE') && 
+    !v.key.startsWith('PG')
+  );
   
   // Generate content with sections
   const sections: string[] = [];
   
-  // NODE_ENV first
+  // NODE_ENV first (no header, just the variable)
   if (nodeEnvVar.length > 0) {
-    sections.push('# Environment\n' + 
-      nodeEnvVar.map(v => `${v.key}=${v.value}`).join('\n'));
+    sections.push(nodeEnvVar.map(v => `${v.key}=${v.value}`).join('\n'));
   }
   
-  // Database configuration
+  // Database configuration second
   if (dbVars.length > 0) {
     sections.push('# Database\n' +
       dbVars.map(v => `${v.key}=${v.value}`).join('\n'));
   }
   
-  // Other services (like RESEND_AUTH)
+  // Services third
   if (serviceVars.length > 0) {
-    // Group by service type
-    const resendVars = serviceVars.filter(v => v.key.startsWith('RESEND_'));
-    const otherServiceVars = serviceVars.filter(v => !v.key.startsWith('RESEND_'));
-    
-    if (resendVars.length > 0) {
-      sections.push('# Email Service\n' +
-        resendVars.map(v => `${v.key}=${v.value}`).join('\n'));
-    }
-    
-    if (otherServiceVars.length > 0) {
-      sections.push('# Services\n' +
-        otherServiceVars.map(v => `${v.key}=${v.value}`).join('\n'));
-    }
-  }
-  
-  // Public variables last
-  if (publicVars.length > 0) {
-    sections.push('# Public Variables\n' + 
-      publicVars.map(v => `${v.key}=${v.value}`).join('\n'));
+    sections.push('# Services\n' +
+      serviceVars.map(v => `${v.key}=${v.value}`).join('\n'));
   }
   
   const content = sections.join('\n\n');
@@ -246,30 +178,6 @@ export async function createEnvFile(filePath: string, variables: EnvVariable[]):
   log.detail(`Created ${filePath}`);
 }
 
-export function getPublicEnvVariables(): EnvVariable[] {
-  return [
-    {
-      key: 'PUBLIC_URL_BASE',
-      value: ''
-    },
-    {
-      key: 'PUBLIC_URL_ID',
-      value: ''
-    },
-    {
-      key: 'PUBLIC_SITE_NAME',
-      value: ''
-    },
-    {
-      key: 'PUBLIC_URL_ASSETS',
-      value: ''
-    },
-    {
-      key: 'PUBLIC_ANALYTICS',
-      value: ''
-    }
-  ];
-}
 
 export function getDevEnvVariables(dbType: 'drizzle' | 'neon'): EnvVariable[] {
   const baseVars: EnvVariable[] = [
@@ -330,36 +238,6 @@ export function getExampleEnvVariables(dbType: 'drizzle' | 'neon'): EnvVariable[
   }
 }
 
-export function getProdEnvVariables(dbType: 'drizzle' | 'neon'): EnvVariable[] {
-  const baseVars: EnvVariable[] = [
-    {
-      key: 'NODE_ENV',
-      value: 'production'
-    }
-  ];
-  
-  if (dbType === 'drizzle') {
-    return [
-      ...baseVars,
-      {
-        key: 'DB_URL',
-        value: ''
-      },
-      {
-        key: 'DB_AUTH',
-        value: ''
-      }
-    ];
-  } else {
-    return [
-      ...baseVars,
-      {
-        key: 'DB_URL',
-        value: ''
-      }
-    ];
-  }
-}
 
 export async function renameDatabaseUrl(filePath: string, newDbUrl?: string): Promise<void> {
   if (!(await pathExists(filePath))) {
@@ -384,11 +262,9 @@ export async function renameDatabaseUrl(filePath: string, newDbUrl?: string): Pr
 }
 
 export async function setupDrizzleEnvironment(dbType: 'drizzle' | 'neon'): Promise<void> {
-  // Get PUBLIC variables and DB variables for templates
-  const publicVariables = getPublicEnvVariables();
+  // Get DB variables for templates
   const devDbVariables = getDevEnvVariables(dbType);
   const exampleDbVariables = getExampleEnvVariables(dbType);
-  const prodDbVariables = getProdEnvVariables(dbType);
   
   // Handle .env file - rename DATABASE_URL to DB_URL and clean up unwanted DATABASE_* vars
   if (await pathExists('.env')) {
@@ -402,7 +278,7 @@ export async function setupDrizzleEnvironment(dbType: 'drizzle' | 'neon'): Promi
     
     // For turso (drizzle), we want to force DB_URL to be ./db/dev.db in development
     // For postgres/neon, we preserve the existing value
-    const devVariables = [...publicVariables, ...devDbVariables];
+    const devVariables = [...devDbVariables];
     const mergedVars = [...cleanedVars];
     
     for (const devVar of devVariables) {
@@ -426,12 +302,12 @@ export async function setupDrizzleEnvironment(dbType: 'drizzle' | 'neon'): Promi
     await updateEnvFile('.env', mergedVars, ['DATABASE_*']);
   } else {
     // Create new .env with dev variables
-    const devVariables = [...publicVariables, ...devDbVariables];
+    const devVariables = [...devDbVariables];
     await createEnvFile('.env', devVariables);
   }
   
   // Handle .env.example - ensure it has the correct template values including DB_AUTH for turso
-  const exampleVars = [...publicVariables, ...exampleDbVariables];
+  const exampleVars = [...exampleDbVariables];
   if (await pathExists('.env.example')) {
     // Parse existing and remove all DATABASE_* variables
     const existingExampleVars = await parseEnvFile('.env.example').then(vars => 
@@ -451,37 +327,4 @@ export async function setupDrizzleEnvironment(dbType: 'drizzle' | 'neon'): Promi
   } else {
     await createEnvFile('.env.example', exampleVars);
   }
-  
-  // Handle .env.prod
-  if (await pathExists('.env.prod')) {
-    // If .env.prod exists, rename DATABASE_URL -> DB_URL and ensure DB_URL is present
-    await renameDatabaseUrl('.env.prod');
-    
-    // Ensure DB_URL is present even for postgres/neon
-    const existingProdVars = await parseEnvFile('.env.prod');
-    if (!existingProdVars.find(v => v.key === 'DB_URL')) {
-      const dbUrlVar = { key: 'DB_URL', value: '' };
-      await updateEnvFile('.env.prod', [dbUrlVar], []);
-    }
-    
-    // For SQLite + Turso, ensure all template vars are present
-    if (dbType === 'drizzle') {
-      const prodVariables = [...publicVariables, ...prodDbVariables];
-      const mergedVars = [...existingProdVars];
-      
-      // Add any missing template vars
-      for (const templateVar of prodVariables) {
-        if (!existingProdVars.find(v => v.key === templateVar.key)) {
-          mergedVars.push(templateVar);
-        }
-      }
-      
-      await updateEnvFile('.env.prod', mergedVars, []);
-    }
-  } else if (dbType === 'drizzle') {
-    // Only create .env.prod for SQLite + Turso if it doesn't exist
-    const prodVariables = [...publicVariables, ...prodDbVariables];
-    await createEnvFile('.env.prod', prodVariables);
-  }
-  // For postgres/neon, we don't create .env.prod if it doesn't exist - user manages their own
 }
