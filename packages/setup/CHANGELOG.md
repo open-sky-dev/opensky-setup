@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - TBD
+
+### Changed
+- Refactored CLI setup flow to combine initial configuration steps into a single "Core Setup" step
+- Introduced "Project Setup" option that bundles SvelteKit structure, .gitignore, .env, and Prettier configuration
+- Tailwind configuration now appears as a separate option alongside other core modules
+- Improved user experience with clearer grouping of related functionality
+
 ## [1.2.0] - 2025-01-18
 
 ### Changed

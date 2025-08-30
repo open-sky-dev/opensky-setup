@@ -41,48 +41,20 @@ async function main() {
   console.log(pc.bold(pc.gray('Recommendation: Commit all changes before running setup for a clean before/after comparison')));
   console.log('');
 
-  // Step 1: Preferences
-  const configModules = await p.multiselect({
-    message: 'Step 1: Preferences (press a for all):',
+  // Step 1: Core Setup
+  const setupSelection = await p.multiselect({
+    message: 'Step 1: Core Setup (press a for all):',
     options: [
       {
-        value: 'sveltekit',
-        label: 'SvelteKit',
-        hint: 'Project structure, hooks, error page'
+        value: 'projectSetup',
+        label: 'Project Setup',
+        hint: 'SvelteKit structure, .gitignore, .env, prettier'
       },
       {
         value: 'tailwind',
-        label: 'tailwind',
+        label: 'Tailwind',
         hint: 'Organization, utils, and default styles'
       },
-      {
-        value: 'prettier',
-        label: 'prettier',
-        hint: 'Configure prettier rules'
-      },
-      {
-        value: 'gitignore',
-        label: '.gitignore',
-        hint: 'Add .gitignore rules'
-      },
-      {
-        value: 'env',
-        label: '.env',
-        hint: 'Adds several PUBLIC_* variables to all .env files'
-      }
-    ],
-    required: false
-  });
-
-  if (p.isCancel(configModules)) {
-    p.cancel('Operation cancelled.');
-    process.exit(0);
-  }
-
-  // Step 2: Core
-  const coreModules = await p.multiselect({
-    message: 'Step 2: Core (press a for all):',
-    options: [
       {
         value: 'utils',
         label: 'Basic Utils',
@@ -112,9 +84,23 @@ async function main() {
     required: false
   });
 
-  if (p.isCancel(coreModules)) {
+  if (p.isCancel(setupSelection)) {
     p.cancel('Operation cancelled.');
     process.exit(0);
+  }
+
+  // Extract the modules to install based on selection
+  const coreModules: string[] = [];
+  const configModules: string[] = [];
+  
+  for (const selection of setupSelection) {
+    if (selection === 'projectSetup') {
+      configModules.push('sveltekit', 'gitignore', 'env', 'prettier');
+    } else if (selection === 'tailwind') {
+      configModules.push('tailwind');
+    } else {
+      coreModules.push(selection);
+    }
   }
 
   // Conditional sub-step: Resend Email Templates
@@ -170,9 +156,9 @@ async function main() {
     drizzleDbType = dbTypeSelection;
   }
 
-  // Step 3: UI Components
+  // Step 2: UI Components
   const uiModules = await p.multiselect({
-    message: 'Step 3: UI Components (press a for all):',
+    message: 'Step 2: UI Components (press a for all):',
     options: [
       {
         value: 'bitsUi',
@@ -193,9 +179,9 @@ async function main() {
     process.exit(0);
   }
 
-  // Step 4: Fonts
+  // Step 3: Fonts
   const fontSelection = await p.multiselect({
-    message: 'Step 4: Fonts (press a for all):',
+    message: 'Step 3: Fonts (press a for all):',
     options: [
       {
         value: 'inter',
@@ -216,12 +202,12 @@ async function main() {
     process.exit(0);
   }
 
-  // Step 5: Additional Fonts (conditional)
+  // Step 4: Additional Fonts (conditional)
   let additionalFonts: string[] = [];
   if (fontSelection.includes('moreFonts')) {
     const fontOptions = getFontOptions();
     additionalFonts = await p.multiselect({
-      message: 'Step 5: Select Additional Fonts (press a for all):',
+      message: 'Step 4: Select Additional Fonts (press a for all):',
       options: fontOptions,
       required: false
     });
