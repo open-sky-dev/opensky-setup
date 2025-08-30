@@ -2,15 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.3.0] - TBD
+## [1.4.0] - 2025-08-30
 
 ### Changed
+- Hooks moved from `src/lib/hooks/` to default location of `src/` and we only add server hooks file now, not placeholders for universal and client hooks as those are very rarely used
 - Refactored CLI setup flow to combine initial configuration steps into a single "Core Setup" step
 - Introduced "Project Setup" option that bundles SvelteKit structure, .gitignore, .env, and Prettier configuration
 - Tailwind configuration now appears as a separate option alongside other core modules
 - Improved user experience with clearer grouping of related functionality
 
-## [1.2.0] - 2025-01-18
+## [1.2.0] - 2025-07-25
 
 ### Changed
 - **Breaking Change**: Separated Drizzle database configurations into `drizzle.config.ts` (development) and `drizzle-prod.config.ts` (production) files for clearer separation of environments
