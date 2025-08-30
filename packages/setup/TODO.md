@@ -4,10 +4,9 @@
 
 - [ ] upstash redis
 - [ ] rate limiting
-- [ ] view transitions: util, tailwind globals
-
 - [ ] feedback ui components
 
+- [ ] better db setup: improve cli and improved output
 - [ ] docker: docker dev container
 - [ ] setup testing
 

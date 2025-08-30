@@ -14,7 +14,7 @@ async function setupHooksFromTemplates(): Promise<string[]> {
   const hooksServerPath = 'src/hooks.server.ts';
   
   if (!(await pathExists(hooksServerPath))) {
-    await copyTemplateFile('sveltekit/hooks/hooks.server.ts', hooksServerPath);
+    await copyTemplateFile('sveltekit/hooks.server.ts', hooksServerPath);
     actions.push(`Created: ${hooksServerPath}`);
     log.success(`Created: ${hooksServerPath}`);
   }
