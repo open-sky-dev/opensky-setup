@@ -4,6 +4,11 @@
     "label": "Nunito (Variable)",
     "hint": "sans-serif, rounded: https://fontsource.org/fonts/nunito"
   },
+  "sn-pro": {
+    "package": "@fontsource-variable/sn-pro",
+    "label": "SN Pro",
+    "hint": "sans-serif, rounded: https://fontsource.org/fonts/sn-pro"
+  },
   "geist": {
     "package": "@fontsource-variable/geist",
     "label": "Geist (Variable)",
@@ -63,6 +68,11 @@
     "package": "@fontsource-variable/crimson-pro",
     "label": "Crimson Pro (Variable)",
     "hint": "serif: https://fontsource.org/fonts/crimson-pro"
+  },
+  "jetbrains-mono": {
+    "package": "@fontsource/jetbrains-mono",
+    "label": "Jetbrains Mono",
+    "hint": "mono: https://fontsource.org/fonts/jetbrains-mono"
   },
   "ibm-plex-mono": {
     "package": "@fontsource/ibm-plex-mono",

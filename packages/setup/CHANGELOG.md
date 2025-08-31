@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.1] - 2025-08-30
+
+### Changed
+- Add fonts: SN Pro, Jetbrains Mono
+
 ## [1.4.0] - 2025-08-30
 
 ### Changed
