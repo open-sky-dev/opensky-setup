@@ -5,7 +5,7 @@
     "hint": "sans-serif, rounded: https://fontsource.org/fonts/nunito"
   },
   "sn-pro": {
-    "package": "@fontsource-variable/sn-pro",
+    "package": "@fontsource/sn-pro",
     "label": "SN Pro",
     "hint": "sans-serif, rounded: https://fontsource.org/fonts/sn-pro"
   },
@@ -70,8 +70,8 @@
     "hint": "serif: https://fontsource.org/fonts/crimson-pro"
   },
   "jetbrains-mono": {
-    "package": "@fontsource/jetbrains-mono",
-    "label": "Jetbrains Mono",
+    "package": "@fontsource-variable/jetbrains-mono",
+    "label": "Jetbrains Mono (Variable)",
     "hint": "mono: https://fontsource.org/fonts/jetbrains-mono"
   },
   "ibm-plex-mono": {
