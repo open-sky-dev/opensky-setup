@@ -69,6 +69,11 @@
     "label": "Crimson Pro (Variable)",
     "hint": "serif: https://fontsource.org/fonts/crimson-pro"
   },
+  "hedvig-letters-serif": {
+    "package": "@fontsource/hedvig-letters-serif",
+    "label": "Hedvig Letters Serif",
+    "hint": "serif: https://fontsource.org/fonts/hedvig-letters-serif"
+  },
   "jetbrains-mono": {
     "package": "@fontsource-variable/jetbrains-mono",
     "label": "Jetbrains Mono (Variable)",
